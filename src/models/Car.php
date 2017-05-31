@@ -64,7 +64,6 @@ class Car{
         $result = $query->fetchAll(PDO::FETCH_CLASS, "Car");
         return $result;
     }
-
     public static function getFromId($car_id){
         $dba = DBAccess::getDBAccessObj();
         $query = $dba->getQueryObj("SELECT * FROM CAR WHERE id = :id");
@@ -73,14 +72,20 @@ class Car{
         $result = $query->fetchAll(PDO::FETCH_CLASS, "Car");
         return $result;
     }
-
-    public static function deleteFromId($car_id)
-	{
+    public static function deleteFromId($car_id){
 		$dba = DBAccess::getDBAccessObj();
 		$query = $dba->getQueryObj("DELETE FROM CAR WHERE id = :id");
 		$query->bindValue(':id',$car_id, PDO::PARAM_INT);
 		$query->execute();
 		return $query->rowCount();
 	}
+    public static function updateFromId($car_id){
+		$dba = DBAccess::getDBAccessObj();
+		$query = $dba->getQueryObj("DELETE FROM CAR WHERE id = :id");
+		$query->bindValue(':id',$car_id, PDO::PARAM_INT);
+		$query->execute();
+		return $query->rowCount();
+	}
+
 
 }

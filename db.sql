@@ -56,6 +56,16 @@ CREATE TABLE CLIENT
     balance INT DEFAULT 0
 );
 
+/* tabla temporal para una clase */
+CREATE TABLE USER
+(
+  id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  mail VARCHAR(50) DEFAULT 'undefined',
+  pass VARCHAR(20) DEFAULT 'undefined',
+  state CHAR DEFAULT 'T'
+);
+
+
 
 /* procedures to CAR */
 DELIMITER $$
@@ -77,6 +87,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `saveCar`(
     --SET @last_insert_id_car = LAST_INSERT_ID();
 $$
 DELIMITER ;
+
 
 
 

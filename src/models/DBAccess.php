@@ -38,8 +38,7 @@
             $query->execute();
             $id = $query->fetch(PDO::FETCH_ASSOC);
             return $id['id'];
-        //    return $this->PDO->lastInsertId();
-
+            //    return $this->PDO->lastInsertId();
         }
 
         /*  Cuando se desee hacer una consulta, a travez del objeto DBAccess,
