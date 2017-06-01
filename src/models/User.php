@@ -4,7 +4,7 @@ require_once("DBAccess.php");
 require_once("lib.php");
 //  </Dependencies ----------------------------------------------
 
-class User{
+class User implements JsonSerializable{
     // <attr ----------------------------------------------------
     private $id;
     private $mail;
@@ -23,6 +23,12 @@ class User{
     public function setState($value) { $this->state = $value; }
     // </getters and setters --------------------------------------
 
+    /* para poder serializar con atributos privados. */
+    public function jsonSerialize(){
+        return get_object_vars($this);
+    }
+
+    // <API methods **************************************
     public function save(){
         try{
             $dba = DBAccess::getDBAccessObj();
@@ -49,7 +55,8 @@ class User{
         $query = $dba->getQueryObj("SELECT * FROM USER;");
         $query->execute();
         $result = $query->fetchAll(PDO::FETCH_CLASS, "User");
-        return $result;
+
+        return json_encode($result);
     }
     public static function getFromId($user_id){
         $dba = DBAccess::getDBAccessObj();
@@ -59,23 +66,22 @@ class User{
         $result = $query->fetchAll(PDO::FETCH_CLASS, "User");
         return $result[0];
     }
-    public static function deleteFromId($user_id)
-	{
+    public static function deleteFromId($user_id){
 		$dba = DBAccess::getDBAccessObj();
 		$query = $dba->getQueryObj("DELETE FROM user WHERE id = :id");
 		$query->bindValue(':id',$user_id, PDO::PARAM_INT);
 		$query->execute();
 		return $query->rowCount();
 	}
-    public static function updateFromId($user)
-	{
-
+    public static function updateFromId($user){
 		$dba = DBAccess::getDBAccessObj();
 		$query = $dba->getQueryObj("UPDATE USER
-        				set mail= :mail,
-        				pass= :pass,
-        				state= :state
-        				WHERE id= :id ;");
+                        				set
+                                            mail= :mail,
+                            				pass= :pass,
+                            				state= :state
+                        				WHERE id= :id ;"
+                                    );
         $query->bindValue(':id', $user->getId(), PDO::PARAM_INT);
 		$query->bindValue(':mail', $user->getMail(), PDO::PARAM_STR);
         $query->bindValue(':pass', $user->getPass(), PDO::PARAM_STR);
@@ -84,6 +90,6 @@ class User{
 		return $query;
         // return 0;
 	}
-
+    // </API methods **************************************
 
 }

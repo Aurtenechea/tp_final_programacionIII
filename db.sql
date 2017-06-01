@@ -24,20 +24,26 @@ CREATE TABLE PERSON
     unique (dni)
 );
 
+-- DROP TABLE LOCATION;
 CREATE TABLE LOCATION
 (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     floor TINYINT NOT NULL DEFAULT 0,
     sector VARCHAR(3) NOT NULL DEFAULT '-',
-    number VARCHAR(5) NOT NULL DEFAULT '-'
+    number VARCHAR(5) NOT NULL DEFAULT '-',
+    reserved BOOLEAN NOT NULL DEFAULT FALSE
     /* agregar para cocheras alquiladas. */
 );
 
 CREATE TABLE EMPLOYEE
 (
-    person_id INT NOT NULL PRIMARY KEY,
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(30) DEFAULT 'undefined',
+    last_name VARCHAR(30) DEFAULT 'undefined',
+    email VARCHAR(50) NOT NULL DEFAULT 'undefined',
     shift VARCHAR(15) NOT NULL DEFAULT 'undefined',
-    password VARCHAR(20) NOT NULL DEFAULT 'pass'
+    password VARCHAR(20) NOT NULL DEFAULT 'pass',
+    state VARCHAR(15) NOT NULL DEFAULT 'active'
 );
 
 CREATE TABLE PARKS
@@ -46,6 +52,9 @@ CREATE TABLE PARKS
     location_id INT NOT NULL,
     check_in DATE DEFAULT NULL,
     check_out DATE DEFAULT NULL,
+    emp_id_chek_in INT NOT NULL,
+    emp_id_chek_out INT NOT NULL,
+    cost NUMERIC(15,2) DEFAULT NULL,
     unique (car_id),
     unique (location_id)
 );
@@ -65,7 +74,23 @@ CREATE TABLE USER
   state CHAR DEFAULT 'T'
 );
 
+CREATE TABLE LOGED_IN
+(
+  emp_id BIGINT NOT NULL,
+  on_date DATE DEFAULT NULL
+  /*  se puede agregar lo de foreign
+  FOREIGN KEY (emp_id) REFERENCES EMPLOYEE(id);*/
+);
 
+
+CREATE TABLE PRICE
+(
+  id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  hour NUMERIC(15,2) DEFAULT 0,
+  half_day NUMERIC(15,2) DEFAULT 0,
+  day NUMERIC(15,2) DEFAULT 0,
+  on_date DATE DEFAULT NULL
+);
 
 /* procedures to CAR */
 DELIMITER $$
@@ -90,7 +115,13 @@ DELIMITER ;
 
 
 
-
+id
+first_name
+last_name
+email
+shift
+password
+state
 
 
 

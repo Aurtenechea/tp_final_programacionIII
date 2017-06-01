@@ -4,7 +4,7 @@ require_once("DBAccess.php");
 require_once("lib.php");
 //  </Dependencies ----------------------------------------------
 
-class Car{
+class Car implements JsonSerializable{
     // <attr ----------------------------------------------------
     private $id;
     private $license;
@@ -29,14 +29,23 @@ class Car{
     public function setComment($value) { $this->comment = $value; }
     // </getters and setters --------------------------------------
 
+    /* para poder serializar con atributos privados. */
+    public function jsonSerialize(){
+        return get_object_vars($this);
+    }
+
+    // <API methods **************************************
     public function save(){
         try{
             $dba = DBAccess::getDBAccessObj();
-            $query = $dba->getQueryObj("CALL saveCar(:license,
+            $query = $dba->getQueryObj("CALL saveCar(
+                                                    :license,
                                                     :color,
                                                     :model,
                                                     :owner_id,
-                                                    :comment)");
+                                                    :comment
+                                                );"
+                                            );
             $query->bindValue(':license',$this->license, PDO::PARAM_STR);
             $query->bindValue(':color',$this->color, PDO::PARAM_STR);
     		$query->bindValue(':model',$this->model, PDO::PARAM_STR);
@@ -52,25 +61,31 @@ class Car{
         // $query = $dba->getQueryObj('select @last_insert_id_car;');
         // $query->execute();
         // $id = $query->fetch(PDO::FETCH_ASSOC);
-
         // return $personaBuscada->id;
+
         return $dba->returnLastInsertId();
     }
-
     public static function getAll(){
         $dba = DBAccess::getDBAccessObj();
         $query = $dba->getQueryObj("SELECT * FROM CAR;");
         $query->execute();
         $result = $query->fetchAll(PDO::FETCH_CLASS, "Car");
-        return $result;
+        return json_encode($result);
     }
     public static function getFromId($car_id){
         $dba = DBAccess::getDBAccessObj();
         $query = $dba->getQueryObj("SELECT * FROM CAR WHERE id = :id");
         $query->bindValue(':id',$car_id, PDO::PARAM_INT);
         $query->execute();
-        $result = $query->fetchAll(PDO::FETCH_CLASS, "Car");
-        return $result;
+        $car = $query->fetchAll(PDO::FETCH_CLASS, "Car");
+        // vd($car);
+        if (!isset($car[0])){
+            $car = array();
+        }
+        else{
+            $car = $car[0];
+        }
+        return $car;
     }
     public static function deleteFromId($car_id){
 		$dba = DBAccess::getDBAccessObj();
@@ -79,13 +94,28 @@ class Car{
 		$query->execute();
 		return $query->rowCount();
 	}
-    public static function updateFromId($car_id){
+    public static function updateFromId($user){
 		$dba = DBAccess::getDBAccessObj();
-		$query = $dba->getQueryObj("DELETE FROM CAR WHERE id = :id");
-		$query->bindValue(':id',$car_id, PDO::PARAM_INT);
+		$query = $dba->getQueryObj("UPDATE CAR
+                        				set
+                                            license=:license,
+                                            color=:color,
+                                            model=:model,
+                                            owner_id=:owner_id,
+                                            comment=:comment
+                        			    WHERE id=:id ;"
+                                );
+        $query->bindValue(':id', $user->getId(), PDO::PARAM_INT);
+		$query->bindValue(':license', $user->getLicense(), PDO::PARAM_STR);
+        $query->bindValue(':color', $user->getColor(), PDO::PARAM_STR);
+        $query->bindValue(':model', $user->getModel(), PDO::PARAM_STR);
+        $query->bindValue(':owner_id', $user->getOwner_id(), PDO::PARAM_INT);
+        $query->bindValue(':comment', $user->getComment(), PDO::PARAM_STR);
 		$query->execute();
 		return $query->rowCount();
 	}
+    // </API methods **************************************
+
 
 
 }
