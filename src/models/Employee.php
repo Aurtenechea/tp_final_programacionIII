@@ -69,7 +69,7 @@ class Employee implements JsonSerializable{
         }catch(Exception $e){
             throw $e;
         }
-        // $query = $dba->getQueryObj('select @last_insert_id_car;');
+        // $query = $dba->getQueryObj('select @last_insert_id_employee;');
         // $query->execute();
         // $id = $query->fetch(PDO::FETCH_ASSOC);
         // return $personaBuscada->id;
@@ -81,27 +81,42 @@ class Employee implements JsonSerializable{
         $query = $dba->getQueryObj("SELECT * FROM EMPLOYEE;");
         $query->execute();
         $result = $query->fetchAll(PDO::FETCH_CLASS, "Employee");
-        return json_encode($result);
+        return $result;
     }
-    public static function getFromId($car_id){
+    public static function getFromId($employee_id){
         $dba = DBAccess::getDBAccessObj();
         $query = $dba->getQueryObj("SELECT * FROM EMPLOYEE WHERE id = :id");
-        $query->bindValue(':id',$car_id, PDO::PARAM_INT);
+        $query->bindValue(':id',$employee_id, PDO::PARAM_INT);
         $query->execute();
-        $car = $query->fetchAll(PDO::FETCH_CLASS, "Employee");
-        // vd($car);
-        if (!isset($car[0])){
-            $car = array();
+        $employee = $query->fetchAll(PDO::FETCH_CLASS, "Employee");
+        // vd($employee);
+        if (!isset($employee[0])){
+            $employee = null;
         }
         else{
-            $car = $car[0];
+            $employee = $employee[0];
         }
-        return $car;
+        return $employee;
     }
-    public static function deleteFromId($car_id){
+    // public static function getFromEmail($email){
+    //     $dba = DBAccess::getDBAccessObj();
+    //     $query = $dba->getQueryObj("SELECT * FROM EMPLOYEE WHERE email = :email");
+    //     $query->bindValue(':id',$email, PDO::PARAM_STR);
+    //     $query->execute();
+    //     $employee = $query->fetchAll(PDO::FETCH_CLASS, "Employee");
+    //     // vd($employee);
+    //     if (!isset($employee[0])){
+    //         $employee = null;
+    //     }
+    //     else{
+    //         $employee = $employee[0];
+    //     }
+    //     return $employee;
+    // }
+    public static function deleteFromId($employee_id){
 		$dba = DBAccess::getDBAccessObj();
 		$query = $dba->getQueryObj("DELETE FROM EMPLOYEE WHERE id = :id");
-		$query->bindValue(':id',$car_id, PDO::PARAM_INT);
+		$query->bindValue(':id',$employee_id, PDO::PARAM_INT);
 		$query->execute();
 		return $query->rowCount();
 	}
@@ -128,6 +143,55 @@ class Employee implements JsonSerializable{
 		$query->execute();
 		return $query->rowCount();
 	}
+
+    public static function verify($email, $password){
+        // session_start();
+        $_SESSION["loged_in"] = false;
+        if( isset($email) && isset($password)){
+            $employee = self::getFromEmail($email);
+            if(isset($employee) && $employee->getPassword() == $password){
+                $_SESSION["loged_in"] = true;
+                $_SESSION["id"] = $employee->getId();
+                $_SESSION["email"] = $email;
+                $_SESSION["first_name"] = $employee->getFirst_name();
+                $_SESSION["last_name"] = $employee->getLast_name();
+                $_SESSION["shift"] = $employee->getShift();
+                $_SESSION["state"] = $employee->getState();
+                $_SESSION["password"] = $employee->getPassword();
+            }
+            return $_SESSION["loged_in"];
+        }
+    }
+
+    public static function getFromEmail($email){
+        if( isset($email) ){
+            try{
+                $dba = DBAccess::getDBAccessObj();
+                $query = $dba->getQueryObj("SELECT  id,
+                                                    first_name,
+                                                    last_name,
+                                                    email,
+                                                    shift,
+                                                    password,
+                                                    state
+                                                FROM EMPLOYEE
+                                                WHERE email = :email;"
+                                            );
+        		$query->bindValue(':email',$email, PDO::PARAM_STR);
+                $query->execute();
+                $employee = $query->fetchAll(PDO::FETCH_CLASS, "Employee");
+            }catch(Exception $e){
+                throw $e;
+            }
+            if (!isset($employee[0])){
+                $employee = null;
+            }
+            else{
+                $employee = $employee[0];
+            }
+            return $employee;
+        }
+    }
     // </API methods **************************************
 
 

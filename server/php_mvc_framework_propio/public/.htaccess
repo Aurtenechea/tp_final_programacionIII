@@ -1,0 +1,10 @@
+RewriteEngine On
+
+    #para todos los request de nombre de archivo que no sean directorios, ni archivos ni links..
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-l
+
+    #.. aplicar la siguiente regla: para cualquier cosa que venga, escribir
+    # index.php?url=    mas el nombre de lo que venia en la url
+RewriteRule  ^(.+)$ index.php?url=$1 [QSA,L]

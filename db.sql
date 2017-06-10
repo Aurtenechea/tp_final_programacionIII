@@ -7,7 +7,7 @@ CREATE TABLE CAR
   id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   license VARCHAR(10) DEFAULT 'undefined',
   color VARCHAR(20) DEFAULT 'undefined',
-  model VARCHAR(50) DEFAULT 'undefined',
+  brand VARCHAR(50) DEFAULT 'undefined',
   owner_id BIGINT NOT NULL,
   comment TINYTEXT
 );
@@ -48,15 +48,14 @@ CREATE TABLE EMPLOYEE
 
 CREATE TABLE PARKS
 (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     car_id INT NOT NULL,
     location_id INT NOT NULL,
-    check_in DATE DEFAULT NULL,
-    check_out DATE DEFAULT NULL,
+    check_in DATETIME DEFAULT NULL,
+    check_out DATETIME DEFAULT NULL,
     emp_id_chek_in INT NOT NULL,
-    emp_id_chek_out INT NOT NULL,
-    cost NUMERIC(15,2) DEFAULT NULL,
-    unique (car_id),
-    unique (location_id)
+    emp_id_chek_out INT DEFAULT NULL,
+    cost NUMERIC(15,2) DEFAULT NULL
 );
 
 CREATE TABLE CLIENT
@@ -123,6 +122,29 @@ shift
 password
 state
 
+SELECT *
+    FROM LOCATION AS L
+    LEFT JOIN PARKS AS P
+        ON L.id = P.location_id
+        WHERE
+            reserved = 0;
+
+
+SELECT *
+    FROM LOCATION AS L
+    LEFT JOIN PARKS AS P
+        ON L.ID = P.location_id
+    WHERE
+        reserved = 0
+        AND (
+            ISNULL(P.check_in)
+            OR
+            NOT ISNULL(P.check_in)
+            AND NOT ISNULL(P.check_out)
+        )
+    LIMIT 1;
+
+DELETE FROM PARKS WHERE id = 5;
 
 
 
