@@ -42,6 +42,7 @@
                 <th>License</th>
                 <th>Brand</th>
                 <th>Color</th>
+                <th>Check_in</th>
                 <th>Options</th>
             </tr>
           </thead>

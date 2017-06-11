@@ -92,13 +92,32 @@ class Parks implements JsonSerializable{
         return $parks;
     }
 
-    // public static function getAll(){
-    //     $dba = DBAccess::getDBAccessObj();
-    //     $query = $dba->getQueryObj("SELECT * FROM PARKS;");
-    //     $query->execute();
-    //     $result = $query->fetchAll(PDO::FETCH_CLASS, "Parks");
-    //     return $result;
-    // }
+    public static function getAllStillIn(){
+        $dba = DBAccess::getDBAccessObj();
+        $query = $dba->getQueryObj("SELECT * FROM PARKS WHERE ISNULL(check_out);");
+        $query->execute();
+        $result = $query->fetchAll(PDO::FETCH_CLASS, "Parks");
+        $responseArray = array();
+
+        /*  si es un array vacio asiganarle null sino dejar el array */
+        $result = empty($result) ? null : $result;
+
+        /*  si no esta vacio lo recorro. */
+        if( !empty($result) ){
+            /*  Recorre los parks y va creando cada objeto con los valores necesarios,
+                reemplazando location id y car id por el objeto correspondiente. */
+            foreach ($result as $item) {
+                $stdClass = new stdClass();
+                $stdClass->id = $item->getId();
+                $stdClass->check_in = $item->getCheck_in();
+                $stdClass->emp_chek_in = Employee::getFromId( $item->getEmp_id_chek_in() );
+                $stdClass->car = Car::getFromId($item->getCar_id());
+                $stdClass->location = Location::getFromId($item->getLocation_id());
+                $responseArray[] = $stdClass;
+            }
+        }
+        return $responseArray;
+    }
     //
     // public static function deleteFromId($parks_id){
 	// 	$dba = DBAccess::getDBAccessObj();

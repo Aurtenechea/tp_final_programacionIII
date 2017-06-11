@@ -2,7 +2,10 @@ console.log("dashboard.js loaded");
 var root_url_api = "/utn/tp_final_programacionIII/src/public";
 var root_url_server = "/utn/tp_final_programacionIII/server/php_mvc_framework_propio/public";
 
+/*  Esta funcion hace una peticion a la api para que si NO esta
+    logueado el usuario vaya directo al login. */
 check_loged_in();
+
 
 $(document).ready(function() {
     $("#park_button").click(park);
@@ -113,7 +116,7 @@ function create_park(param_car){
 }
 // deleteCar_button (esto estaba en cualquier lado y daba error).
 function fillCarsList(){
-    url = root_url_api + "/car";
+    url = root_url_api + "/parks/still_in";
     var ajax = $.ajax(
         {
             type: 'GET',
@@ -123,24 +126,25 @@ function fillCarsList(){
     var ajaxSucces = function( data ){
         dataJson = JSON.parse(data)
         console.log(dataJson);
-        if(dataJson.cars != null){
+        if(dataJson.parks != null){
             var i ;
             var str = '';
-            var cars = dataJson.cars
-            for(i=0; i < cars.length; i++){
+            var parks = dataJson.parks
+            for(i=0; i < parks.length; i++){
                 str += "<tr>";
-                str +=  "<td>"+cars[i].license+"</td>";
-                str +=  "<td>"+cars[i].brand+"</td>";
-                str +=  "<td>"+cars[i].color+"</td>";
+                str +=  "<td>"+parks[i].car.license+"</td>";
+                str +=  "<td>"+parks[i].car.brand+"</td>";
+                str +=  "<td>"+parks[i].car.color+"</td>";
+                str +=  "<td>"+parks[i].check_in+"</td>";
                 str +=  "<td>"+
                             // "<button  \
                             //     class='deleteCar_button'  \
-                            //     value='"+cars[i].id+"'  \
+                            //     value='"+parks[i].id+"'  \
                             //     type='button'>Delete \
                             // </button>"+
                             "<button  \
                                 class='outCar_button'  \
-                                value='"+cars[i].id+"'  \
+                                value='"+parks[i].id+"'  \
                                 type='button'>Out \
                             </button>"+
                         "</td>";

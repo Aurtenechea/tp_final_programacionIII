@@ -111,6 +111,41 @@ $app->delete('/car/{car_id}', function (Request $request, Response $response){
 /*******************************************/
 /*  Funciones de manejo de la clase Parks  */
 /*******************************************/
+/*  devuelve un json de un array de los autos que estan estacionados y no
+    salieron. */
+$app->get('/parks/still_in', function (Request $request, Response $response){
+    /*  preseteo el valor de retorno a null */
+    $result = null;
+    /*  getAll devuelve un array de autos o bien null. */
+    $parks = Parks::getAllStillIn();
+    /*  lo convierto a json siendo $cars un array o null. */
+    $result = json_encode( array('parks' => $parks) );
+    /*  devuelvo un json de un array con la clave 'parks' con un array
+        de parks o null. */
+    // vd($result); die();
+    return $result;
+    // $response->getBody()->write("get para get all");
+});
+
+// $app->get('/parks/out/{parks_id}', function (Request $request, Response $response){
+//     $preJSON = array(   'outed' => false,
+//                         'parks' => NULL );
+//     $parks_id = $request->getAttribute('parks_id');
+//     $parks = parks::getFromId($parks_id);
+//     $outed = 0;
+//     if(isset($parks)){
+//         $outed = parks::deleteFromId($parks->getId());
+//     }
+//     // $a = $response->getBody()->write("Hello, $parks_id");
+//     if($outed){
+//         $preJSON['outed'] = true;
+//         $preJSON['parks'] = $parks;
+//     }
+//     $json = json_encode(  $preJSON,
+//                             JSON_FORCE_OBJECT);
+//     return $json;
+// });
+
 $app->post('/parks', function (Request $request, Response $response){
     $preJSON = array(   'saved'     => false,
                         'car'       => NULL,

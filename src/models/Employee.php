@@ -88,15 +88,18 @@ class Employee implements JsonSerializable{
         $query = $dba->getQueryObj("SELECT * FROM EMPLOYEE WHERE id = :id");
         $query->bindValue(':id',$employee_id, PDO::PARAM_INT);
         $query->execute();
-        $employee = $query->fetchAll(PDO::FETCH_CLASS, "Employee");
+        $result = $query->fetchAll(PDO::FETCH_CLASS, "Employee");
         // vd($employee);
-        if (!isset($employee[0])){
-            $employee = null;
-        }
-        else{
-            $employee = $employee[0];
-        }
-        return $employee;
+        /*  si es un array vacio asiganarle null sino dejar el array */
+        $result = empty($result) ? null : $result[0];
+        // if (!isset($employee[0])){
+        //     $employee = null;
+        // }
+        // else{
+        //     $employee = $employee[0];
+        // }
+        // vd($result); die();
+        return $result;
     }
     // public static function getFromEmail($email){
     //     $dba = DBAccess::getDBAccessObj();
