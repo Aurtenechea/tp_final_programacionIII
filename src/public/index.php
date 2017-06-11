@@ -159,6 +159,14 @@ $app->get('/employee', function (Request $request, Response $response){
     $json = json_encode( array(  'employees' => $employees) );
     return $json;
 });
+$app->get('/employee/check', function (Request $request, Response $response){
+    $log = array(  'loged_in' => false );
+    if( isset($_SESSION['loged_in']) && $_SESSION['loged_in'] ){
+        $log['loged_in'] = true;
+    }
+    $json = json_encode($log);
+    return $json;
+});
 $app->get('/employee/{employee_id}', function (Request $request, Response $response){
     $employee_id = $request->getAttribute('employee_id');
     $employee = Employee::getFromId($employee_id);
@@ -168,6 +176,7 @@ $app->get('/employee/{employee_id}', function (Request $request, Response $respo
                             JSON_FORCE_OBJECT);
     return $json;
 });
+
 $app->put('/employee', function (Request $request, Response $response){
     $preJSON = array(   'updated' => false,
                         'employee' => NULL );
@@ -253,7 +262,16 @@ $app->post('/employee/verify', function (Request $request, Response $response){
     return $json;
 });
 
-$app->get('emplyee/logout', function (Request $request, Response $response){
+$app->get('employee/logout', function (Request $request, Response $response){
+    // if (ini_get("session.use_cookies")) {
+    //     $params = session_get_cookie_params();
+    //     setcookie(session_name(), '', time() - 42000,
+    //         $params["path"], $params["domain"],
+    //         $params["secure"], $params["httponly"]
+    //     );
+    // }
+    session_unset($_SESSION['loged_in']);
+    // $_SESSION['loged_in'] = false;
     session_destroy();
     // header('location:http://localhost/utn/tp_final_programacionIII/server/php_mvc_framework_propio/public/employee/login/')
 });

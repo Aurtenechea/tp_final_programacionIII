@@ -19,11 +19,11 @@ class HomeController
     /*  ESTA FUNCION NO DEBERIA VERIFICAR NADA, SIMPLEMENTE CONTESTAR LA PETICION
         ES EL .js EL QUE VA A VERIFICAR CON LA API Y REDICCIONAR SI ES NECESARIO. */
     public function actionDashboard(){
-        session_start();
-
-        if( !isset($_SESSION['loged_in']) || !$_SESSION['loged_in']){
-            header("location:http://localhost/utn/tp_final_programacionIII/server/php_mvc_framework_propio/public/user/login/");
-        }
+        // session_start();
+        //
+        // if( !isset($_SESSION['loged_in']) || !$_SESSION['loged_in']){
+        //     header("location:http://localhost/utn/tp_final_programacionIII/server/php_mvc_framework_propio/public/user/login/");
+        // }
         Response::render('dashboard', []);
     }
 

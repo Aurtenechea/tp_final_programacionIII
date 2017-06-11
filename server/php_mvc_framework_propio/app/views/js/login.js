@@ -2,8 +2,12 @@ console.log("login.js loaded");
 
 var root_url_server = "/utn/tp_final_programacionIII/server/php_mvc_framework_propio/public";
 var root_url_api = "/utn/tp_final_programacionIII/src/public";
-    /*  ANTES QUE NADA SE DEBERIA HACER UNA PETICION A LA API PARA QUE SI ESTA
-        LOGUEADO EL USUARIO VAYA DIRECTO AL DASHBOARD SIN LOGEARSE. */
+
+/*  Esta funcion hace una peticion a la api para que si esta
+    logueado el usuario vaya directo al dashboard sin logearse. */
+check_loged_in();
+
+
 /*  Toma los valores del login, los envia via con ajax a la api.
     La api verifica si estan el usuario esta en la base de datos y retorna un json.
     Este contiene la info del usuario y si esta logueado o no.
@@ -40,3 +44,31 @@ function log(){
     /*  se ejecuta el ajax */
     $.post(url, params, callback);
 }
+
+/*  Esta funcion hace una peticion a la api para que si esta
+    logueado el usuario vaya directo al dashboard sin logearse. */
+function check_loged_in(){
+    /*  prepara la url de la api */
+    var url = root_url_api + "/employee/check";
+    /*  creo el objeto ajax. */
+    var parkCarAjax = $.ajax(
+        {
+            type: 'GET',
+            url: url,
+        }
+    );
+    /*  CALLBACK SUCCES. Si se dispara y se creo el parks, setea el result a true. */
+    var callbackSucces = function( data ){
+        console.log(data);
+        dataJson = JSON.parse(data);
+        if(dataJson.loged_in){
+            window.location.replace(root_url_server + "/home/dashboard/");
+        }
+    };
+    /*  CALLBACK ERROR */
+    function callbackError(error){
+        console.log("CallbackError:" + error);
+    }
+    /*  ejecuto el ajax */
+    parkCarAjax.then(callbackSucces, callbackError);
+};

@@ -1,5 +1,8 @@
 console.log("dashboard.js loaded");
 var root_url_api = "/utn/tp_final_programacionIII/src/public";
+var root_url_server = "/utn/tp_final_programacionIII/server/php_mvc_framework_propio/public";
+
+check_loged_in();
 
 $(document).ready(function() {
     $("#park_button").click(park);
@@ -158,6 +161,7 @@ function fillCarsList(){
 /*  Se destruye la sesion en la api. Esta no contestara mas las paticiones.
     Tambien se redirecciona al login. */
 function logout(){
+    $.removeCookie("PHPSESSID", {path: '/'});
     url = root_url_api + "/employee/logout";
     var ajax = $.ajax(
         {
@@ -185,6 +189,7 @@ function outCar(){
     console.log(this);
 }
 
+
 /* Esta funcion no se si tiene sentido. Eliminar un auto...*/
 // function deleteCar(){
 //     console.log(this);
@@ -203,3 +208,31 @@ function outCar(){
 //     }
 //     ajax.then(ajaxSucces, ajaxError);
 // }
+
+/*  Esta funcion hace una peticion a la api para que si NO esta
+    logueado el usuario vaya directo al login. */
+function check_loged_in(){
+    /*  prepara la url de la api */
+    var url = root_url_api + "/employee/check";
+    /*  creo el objeto ajax. */
+    var parkCarAjax = $.ajax(
+        {
+            type: 'GET',
+            url: url,
+        }
+    );
+    /*  CALLBACK SUCCES. Si se dispara y se creo el parks, setea el result a true. */
+    var callbackSucces = function( data ){
+        console.log(data);
+        dataJson = JSON.parse(data);
+        if(!dataJson.loged_in){
+            window.location.replace(root_url_server + "/user/login/");
+        }
+    };
+    /*  CALLBACK ERROR */
+    function callbackError(error){
+        console.log("CallbackError:" + error);
+    }
+    /*  ejecuto el ajax */
+    parkCarAjax.then(callbackSucces, callbackError);
+};
