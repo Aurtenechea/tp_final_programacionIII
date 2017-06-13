@@ -54,8 +54,10 @@ function park(){
         console.log(data);
         dataJson = JSON.parse(data);
         if(dataJson.saved){
+            console.log(create_park(dataJson.car));
             if(create_park(dataJson.car)){
                 /*  refrescar la lista. */
+                console.log("se refrezca la lista.");
                 fillCarsList();
             }
         }
@@ -97,7 +99,7 @@ function create_park(param_car){
 
     /*  CALLBACK SUCCES. Si se dispara y se creo el parks, setea el result a true. */
     var callbackSucces = function( data ){
-        console.log(data);
+        // console.log(data);
         dataJson = JSON.parse(data);
         if(dataJson.saved){
             result = true;
@@ -124,7 +126,9 @@ function fillCarsList(){
         }
     );
     var ajaxSucces = function( data ){
-        dataJson = JSON.parse(data)
+        console.log(data);
+        dataJson = JSON.parse(data);
+
         console.log(dataJson);
         if(dataJson.parks != null){
             var i ;
@@ -191,6 +195,21 @@ function logout(){
 function outCar(){
     console.log("outCar");
     console.log(this);
+    url = root_url_api + "/parks/out_car/" + this.value;
+        var ajax = $.ajax(
+            {
+                type: 'GET',
+                url: url
+            }
+        );
+        var ajaxSucces = function( data ){
+            console.log(data);
+            fillCarsList();
+        };
+        function ajaxError(error){
+            console.log("ajax: " + error);
+        }
+        ajax.then(ajaxSucces, ajaxError);
 }
 
 

@@ -75,6 +75,34 @@ class Parks implements JsonSerializable{
         // return $personaBuscada->id;
         return $dba->returnLastInsertId();
     }
+    public function outCar(){
+        // vd($this);die();
+        try{
+            $dba = DBAccess::getDBAccessObj();
+            // UPDATE CAR set license=:license, color=:color, brand=:brand, owner_id=:owner_id, comment=:comment WHERE id=:id ;
+            $query = $dba->getQueryObj("UPDATE PARKS SET    check_out =          NOW(),
+                                                            emp_id_chek_out =   :emp_id_chek_out
+                                            WHERE id = :id;"
+                                        );
+            $query->bindValue(':id',$this->id, PDO::PARAM_INT);
+            // $query->bindValue(':location_id',$this->location_id, PDO::PARAM_INT);
+    		// $query->bindValue(':check_in',$this->check_in, PDO::PARAM_STR);
+            $query->bindValue(':emp_id_chek_out', $this->emp_id_chek_out, PDO::PARAM_INT);
+    		// $query->bindValue(':cost', $this->cost, PDO::PARAM_STR);
+            $query->execute();
+
+            // $query = $dba->getQueryObj("select * from persona where dni = ".$this->dni);
+            // $query->execute();
+    		// $personaBuscada= $query->fetchObject('persona'); //devuelve una persona
+        }catch(Exception $e){
+            throw $e;
+        }
+        // $query = $dba->getQueryObj('select @last_insert_id_location;');
+        // $query->execute();
+        // $id = $query->fetch(PDO::FETCH_ASSOC);
+        // return $personaBuscada->id;
+        return $query->rowCount();
+    }
 
     public static function getFromId($parks_id){
         $dba = DBAccess::getDBAccessObj();
@@ -83,12 +111,8 @@ class Parks implements JsonSerializable{
         $query->execute();
         $parks = $query->fetchAll(PDO::FETCH_CLASS, "Parks");
         // vd($parks);die();
-        if (!isset($parks[0])){
-            $parks = null;
-        }
-        else{
-            $parks = $parks[0];
-        }
+        /*  si es un array vacio asiganarle null sino dejar el array */
+        $parks = empty($parks) ? null : $parks[0];
         return $parks;
     }
 
@@ -97,26 +121,10 @@ class Parks implements JsonSerializable{
         $query = $dba->getQueryObj("SELECT * FROM PARKS WHERE ISNULL(check_out);");
         $query->execute();
         $result = $query->fetchAll(PDO::FETCH_CLASS, "Parks");
-        $responseArray = array();
-
+        // $responseArray = array();
         /*  si es un array vacio asiganarle null sino dejar el array */
         $result = empty($result) ? null : $result;
-
-        /*  si no esta vacio lo recorro. */
-        if( !empty($result) ){
-            /*  Recorre los parks y va creando cada objeto con los valores necesarios,
-                reemplazando location id y car id por el objeto correspondiente. */
-            foreach ($result as $item) {
-                $stdClass = new stdClass();
-                $stdClass->id = $item->getId();
-                $stdClass->check_in = $item->getCheck_in();
-                $stdClass->emp_chek_in = Employee::getFromId( $item->getEmp_id_chek_in() );
-                $stdClass->car = Car::getFromId($item->getCar_id());
-                $stdClass->location = Location::getFromId($item->getLocation_id());
-                $responseArray[] = $stdClass;
-            }
-        }
-        return $responseArray;
+        return $result;
     }
     //
     // public static function deleteFromId($parks_id){
