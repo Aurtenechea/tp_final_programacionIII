@@ -27,6 +27,7 @@
     <body>
         <label for="license">License:</label><br>
         <input type="text" id="license" value="licenseA">
+        <button id= "search_car">search</button>
         <br><br>
         <label for="brand">Brand:</label><br>
         <input type="text" id="brand" value="brandA">
@@ -34,18 +35,26 @@
         <label for="color">Color:</label><br>
         <input type="text" id="color" value="colorA">
         <br><br>
+        <input type="checkbox" id="disabled_parking_place" value="true">Disabled parking place<br>
+        <br>
         <button id="park_button">park</button>
         <button id="logout_button">logout</button>
         <button id="fillCarsList_button">fcl</button>
+        <br><br>
+        <label for="license">Out car by License:</label><br>
+        <input type="text" id="licence_outFromlicense" value="">
+        <button id="outFromLicense">Out</button>
 
         <!-- <label id="result"></label><br> -->
-
+        <h2>Still inside</h2>
         <table class="table table-striped" id="parked_cars_table">
           <thead >
             <tr id="parked_cars_tr_thead">
                 <th>License</th>
                 <th>Brand</th>
                 <th>Color</th>
+                <th>Disabled</th>
+                <th>Location</th>
                 <th>Check_in</th>
                 <th>Options</th>
             </tr>
@@ -55,8 +64,24 @@
           </tbody>
         </table>
 
+        <h2>Outed</h2>
+        <table class="table table-striped" id="outed_cars_table">
+          <thead >
+            <tr id="outed_cars_tr_thead">
+                <th>License</th>
+                <th>Brand</th>
+                <th>Color</th>
+                <th>Disabled</th>
+                <th>Location</th>
+                <th>Check_in</th>
+                <th>Check_out</th>
+                <th>Cost</th>
+            </tr>
+          </thead>
+          <tbody id="outed_cars_tbody">
 
-
+          </tbody>
+        </table>
     </body>
 <footer>
 

@@ -161,12 +161,24 @@ class Employee implements JsonSerializable{
                 $_SESSION["shift"] = $employee->getShift();
                 $_SESSION["state"] = $employee->getState();
                 $_SESSION["password"] = $employee->getPassword();
+                $dba = DBAccess::getDBAccessObj();
+                $query = $dba->getQueryObj("INSERT INTO EMP_LOG (
+                                                                    emp_id,
+                                                                    log_in
+                                                                )
+                                                VALUES (:emp_id,
+                                                        NOW()
+                                                    );"
+                                                );
+                $query->bindValue(':emp_id',$_SESSION["id"], PDO::PARAM_INT);
+                $query->execute();
             }
-            return $_SESSION["loged_in"];
         }
+        return $_SESSION["loged_in"];
     }
 
     public static function getFromEmail($email){
+        $employee = null;
         if( isset($email) ){
             try{
                 $dba = DBAccess::getDBAccessObj();
@@ -192,8 +204,8 @@ class Employee implements JsonSerializable{
             else{
                 $employee = $employee[0];
             }
-            return $employee;
         }
+        return $employee;
     }
     // </API methods **************************************
 

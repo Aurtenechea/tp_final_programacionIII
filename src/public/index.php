@@ -10,15 +10,14 @@ require_once('../models/Employee.php');
 require_once('../models/User.php');
 require_once('../models/Location.php');
 require_once('../models/Parks.php');
-
-
+require_once('../models/Price.php');
 
 $app = new \Slim\App;
 session_start();
+
 /****************************************/
 /*  Funciones de manejo de la clase Car */
 /****************************************/
-
 /*  devuelve un json de un array de autos o null */
 $app->get('/car', function (Request $request, Response $response){
     /*  preseteo el valor de retorno a null */
@@ -30,19 +29,30 @@ $app->get('/car', function (Request $request, Response $response){
     /*  devuelvo un json de un array con la clave 'cars' con un array
         de autos o null. */
     return $result;
-    // $response->getBody()->write("get para get all");
 });
-$app->get('/car/{car_id}', function (Request $request, Response $response){
-    $car_id = $request->getAttribute('car_id');
+/*  devuelve un json de un de auto o null */
+$app->get('/car/{car_license}', function (Request $request, Response $response){
+    $car_license = $request->getAttribute('car_license');
     /*  la funcion devuelve un array o null */
-    $car = Car::getFromId($car_id);
+    // vd($car_license);die;
+    $car = Car::getFromLicense($car_license);
     /*  devuelvo un json de un array con la clave 'cars' con un objeto
         auto o null. */
-    $json = json_encode( array(  'car' => $car),
-                            JSON_FORCE_OBJECT);
+    $json = json_encode( array('car' => $car) );
     return $json;
-    // $response->getBody()->write("Hello, ");
 });
+// $app->get('/car/{car_id}', function (Request $request, Response $response){
+//     $car_id = $request->getAttribute('car_id');
+//     /*  la funcion devuelve un array o null */
+//     $car = Car::getFromId($car_id);
+//     /*  devuelvo un json de un array con la clave 'cars' con un objeto
+//         auto o null. */
+//     $json = json_encode( array(  'car' => $car),
+//                             JSON_FORCE_OBJECT);
+//     return $json;
+//     // $response->getBody()->write("Hello, ");
+// });
+/*  devuelve un json con un buleano en updated y el auto modificado en car o null */
 $app->put('/car', function (Request $request, Response $response){
     $preJSON = array(   'updated' => false,
                         'car' => NULL );
@@ -54,7 +64,6 @@ $app->put('/car', function (Request $request, Response $response){
     $car->setOwner_id($params['owner_id']);
     $car->setComment($params['comment']);
     $updated_id = Car::updateFromId($car);
-    // $response->getBody()->write("Color" . $params['color']);
     if($updated_id){
         $preJSON['updated'] = true;
         $preJSON['car'] = $car;
@@ -62,6 +71,7 @@ $app->put('/car', function (Request $request, Response $response){
     $json = json_encode($preJSON);
     return $json;
 });
+/*  devuelve un json con un booleado en saved y el auto estacionado. */
 $app->post('/car', function (Request $request, Response $response){
     $preJSON = array(   'saved' => false,
                         'car' => NULL );
@@ -72,21 +82,16 @@ $app->post('/car', function (Request $request, Response $response){
     $car->setLicense($params['license']);
     $car->setComment($params['comment']);
     $car->setOwner_id($_SESSION['id']); // el id del empleado.
-    // vd($car);
-    // vd($_SESSION);
-
-
     $saved_id = $car->save();
-    // $response->getBody()->write("se inserto con el id: ".$saved_id);
     if($saved_id){
         $car->setId($saved_id);
         $preJSON['saved'] = true;
         $preJSON['car'] = $car;
     }
-    $json = json_encode(  $preJSON,
-                            JSON_FORCE_OBJECT);
+    $json = json_encode($preJSON);
     return $json;
 });
+/*  devuelve un json con un booleado en deleted y el auto borrado. */
 $app->delete('/car/{car_id}', function (Request $request, Response $response){
     $preJSON = array(   'deleted' => false,
                         'car' => NULL );
@@ -96,16 +101,13 @@ $app->delete('/car/{car_id}', function (Request $request, Response $response){
     if(isset($car)){
         $deleted = Car::deleteFromId($car->getId());
     }
-    // $a = $response->getBody()->write("Hello, $car_id");
     if($deleted){
         $preJSON['deleted'] = true;
         $preJSON['car'] = $car;
     }
-    $json = json_encode(  $preJSON,
-                            JSON_FORCE_OBJECT);
+    $json = json_encode($preJSON);
     return $json;
 });
-
 
 
 /*******************************************/
@@ -118,34 +120,92 @@ $app->get('/parks/still_in', function (Request $request, Response $response){
     $responseArray = [];
     /*  getAll devuelve un array de parks o bien null. */
     $result = Parks::getAllStillIn();
-
-    // /*  si es un array vacio asiganarle null sino dejar el array */
-    // $result = empty($result) ? null : $result;
-
     /*  si no esta vacio lo recorro. */
     if( !empty($result) ){
         /*  Recorre los parks y va creando cada objeto con los valores necesarios,
             reemplazando location id y car id por el objeto correspondiente. */
         foreach ($result as $item) {
-            $stdClass = new stdClass();
-            $stdClass->id = $item->getId();
-            $stdClass->check_in = $item->getCheck_in();
-            $stdClass->emp_chek_in = Employee::getFromId( $item->getEmp_id_chek_in() );
-            $stdClass->car = Car::getFromId($item->getCar_id());
-            $stdClass->location = Location::getFromId($item->getLocation_id());
-            $responseArray[] = $stdClass;
+            // $stdClass = new stdClass();
+            // $stdClass->id = $item->getId();
+            // $stdClass->check_in = $item->getCheck_in();
+            // $stdClass->emp_chek_in = Employee::getFromId( $item->getEmp_id_chek_in() );
+            // $stdClass->car = Car::getFromId($item->getCar_id());
+            // $stdClass->location = Location::getFromId($item->getLocation_id());
+            // $responseArray[] = $stdClass;
+            // prueba
+            // $stdClass = new stdClass();
+            // $stdClass->id = $item->getId();
+            // $stdClass->check_in = $item->getCheck_in();
+            $item->emp_chek_in = Employee::getFromId( $item->getEmp_id_chek_in() );
+            $item->car = Car::getFromId($item->getCar_id());
+            $item->location = Location::getFromId($item->getLocation_id());
+            $responseArray[] = $item;
         }
     }
     $responseArray = empty($responseArray) ? null : $responseArray;
-
     /*  devuelvo un json de un array con la clave 'parks' con un array
         de parks o null. */
-    $result = json_encode( array('parks' => $responseArray) );
-    // vd($result); die();
+    $result = json_encode(array('parks' => $responseArray));
     return $result;
-    // $response->getBody()->write("get para get all");
 });
-
+/*  devuelve un json de un array de los autos que estan estacionados y no
+    salieron. */
+$app->get('/parks/outed', function (Request $request, Response $response){
+    /*  preseteo el array de respuesta. */
+    $responseArray = [];
+    /*  getAll devuelve un array de parks o bien null. */
+    $result = Parks::getAllOuted();
+    /*  si no esta vacio lo recorro. */
+    if( !empty($result) ){
+        /*  Recorre los parks y va creando cada objeto con los valores necesarios,
+            reemplazando location id y car id por el objeto correspondiente. */
+        foreach ($result as $item) {
+            // $stdClass = new stdClass();
+            // $stdClass->id = $item->getId();
+            // $stdClass->check_in = $item->getCheck_in();
+            // $stdClass->emp_chek_in = Employee::getFromId( $item->getEmp_id_chek_in() );
+            // $stdClass->car = Car::getFromId($item->getCar_id());
+            // $stdClass->location = Location::getFromId($item->getLocation_id());
+            // $responseArray[] = $stdClass;
+            // prueba
+            // $stdClass = new stdClass();
+            // $stdClass->id = $item->getId();
+            // $stdClass->check_in = $item->getCheck_in();
+            $item->emp_chek_in = Employee::getFromId( $item->getEmp_id_chek_in() );
+            $item->car = Car::getFromId($item->getCar_id());
+            $item->location = Location::getFromId($item->getLocation_id());
+            $responseArray[] = $item;
+        }
+    }
+    $responseArray = empty($responseArray) ? null : $responseArray;
+    /*  devuelvo un json de un array con la clave 'parks' con un array
+        de parks o null. */
+    $result = json_encode(array('parks' => $responseArray));
+    return $result;
+});
+/*  devuelve un json con un booleano en outed y el parks cerrado o null. */
+$app->get('/parks/out_car/license/{car_license}', function (Request $request, Response $response){
+    /*  preseteo la respuesta. */
+    $preJSON = array(   'outed' => false,
+                        'parks' => NULL );
+    $car_license = $request->getAttribute('car_license');
+    /*  traigo el objeto parks a modificar. si no existe devuelve null. */
+    // $is_parked = Parks::isStillInFromLicense($car_license);
+    $parks = Parks::getFromLicense($car_license);
+    if(isset($parks)){
+        // $parks->setEmp_id_chek_out($_SESSION['id']);
+        // para probar con postman. borrar y habilitar la de arriba
+        $parks->setEmp_id_chek_out(30);
+        $outed = $parks->outCar();
+        if($outed){
+            $preJSON['outed'] = true;
+            $preJSON['parks'] = Parks::getFromId($parks->getId());
+        }
+    }
+    $json = json_encode($preJSON);
+    return $json;
+});
+/*  devuelve un json con un booleano en outed y el parks cerrado o null. */
 $app->get('/parks/out_car/{parks_id}', function (Request $request, Response $response){
     /*  preseteo la respuesta. */
     $preJSON = array(   'outed' => false,
@@ -153,24 +213,21 @@ $app->get('/parks/out_car/{parks_id}', function (Request $request, Response $res
     $parks_id = $request->getAttribute('parks_id');
     /*  traigo el objeto parks a modificar. si no existe devuelve null. */
     $parks = Parks::getFromId($parks_id);
-
-    /*  */
     if(isset($parks)){
         // $parks->setEmp_id_chek_out($_SESSION['id']);
         // para probar con postman. borrar y habilitar la de arriba
         $parks->setEmp_id_chek_out(30);
-
         $outed = $parks->outCar();
-        // vd($outed); die();
-    }
-    if($outed){
-        $preJSON['outed'] = true;
-        $preJSON['parks'] = $parks = Parks::getFromId($parks_id);
+        if($outed){
+            $preJSON['outed'] = true;
+            $preJSON['parks'] = Parks::getFromId($parks_id);
+        }
     }
     $json = json_encode($preJSON);
     return $json;
 });
-
+/*  devuelve un json con un booleado en saved y null o el objeto en car,
+    location y parks. */
 $app->post('/parks', function (Request $request, Response $response){
     $preJSON = array(   'saved'     => false,
                         'car'       => NULL,
@@ -178,37 +235,79 @@ $app->post('/parks', function (Request $request, Response $response){
                         'parks'     => NULL
                     );
     $params = $request->getParsedBody();
-    $car = Car::getFromId($params['id']);
-    // vd($car); die();
-    $location = Location::getFreeUnreserved();
-    // vd($location);
-    if(isset($car) && isset($location)){
-        $parks = new Parks();
-        $parks->setCar_id($car->getId());
-        $parks->setLocation_id($location->getId());
-        $parks->setEmp_id_chek_in($_SESSION['id']);
-        // $parks->setEmp_id_chek_in('14');
-        $parks_insert_id = $parks->save();
-        // vd($parks_insert_id); die();
-        // si es cero no deberia traer nada.
-        $parks = $parks->getFromId($parks_insert_id);
-        // vd ($parks); die();
-
-        // y no deberia entrar aca.
-        if(isset($parks)){
-            // $parks->setId($saved_id);
-            $preJSON['saved'] = true;
-            $preJSON['car'] = $car;
-            $preJSON['location'] = $location;
-            $preJSON['parks'] = $parks;
+    $car = Car::getFromLicense($params['license']);
+    $isIn = Parks::isStillInFromLicense($params['license']);
+    if(!$isIn){
+        if(empty($car)){
+            $car = new Car();
+            $car->setLicense($params['license']);
+            $car->setBrand($params['brand']);
+            $car->setColor($params['color']);
+            $car->setDisabled( json_decode($params['disabled']) ? '1' : '0' );
+            /*  esto no va.. el awner id no sirve mas. */
+            // $car->setOwner_id($_SESSION['id']);
+            $car->setOwner_id(30);
+            $car->save();
+            $car = Car::getFromLicense($params['license']);
+        }
+        $location = $car->getDisabled() ? Location::getFreeReserved() : Location::getFreeUnreserved();
+        // if($params['disabled'])
+        if(!empty($car) && !empty($location)){
+            $parks = new Parks();
+            $parks->setCar_id($car->getId());
+            $parks->setLocation_id($location->getId());
+            // $parks->setEmp_id_chek_in($_SESSION['id']);
+            $parks->setEmp_id_chek_in('30');
+            $parks_insert_id = $parks->save();
+            // si es cero no deberia traer nada...
+            $parks = $parks->getFromId($parks_insert_id);
+            // ...y no deberia entrar aca.
+            if(!empty($parks)){
+                $preJSON['saved'] = true;
+                $preJSON['car'] = $car;
+                $preJSON['location'] = $location;
+                $preJSON['parks'] = $parks;
+            }
         }
     }
     $json = json_encode($preJSON);
     return $json;
 });
-
-
-
+// $app->post('/parks', function (Request $request, Response $response){
+//     $preJSON = array(   'saved'     => false,
+//                         'car'       => NULL,
+//                         'location'  => NULL,
+//                         'parks'     => NULL
+//                     );
+//     $params = $request->getParsedBody();
+//     $car = Car::getFromId($params['id']);
+//     // vd($car); die();
+//     $location = Location::getFreeUnreserved();
+//     // vd($location);
+//     if(isset($car) && isset($location)){
+//         $parks = new Parks();
+//         $parks->setCar_id($car->getId());
+//         $parks->setLocation_id($location->getId());
+//         $parks->setEmp_id_chek_in($_SESSION['id']);
+//         // $parks->setEmp_id_chek_in('14');
+//         $parks_insert_id = $parks->save();
+//         // vd($parks_insert_id); die();
+//         // si es cero no deberia traer nada.
+//         $parks = $parks->getFromId($parks_insert_id);
+//         // vd ($parks); die();
+//
+//         // y no deberia entrar aca.
+//         if(isset($parks)){
+//             // $parks->setId($saved_id);
+//             $preJSON['saved'] = true;
+//             $preJSON['car'] = $car;
+//             $preJSON['location'] = $location;
+//             $preJSON['parks'] = $parks;
+//         }
+//     }
+//     $json = json_encode($preJSON);
+//     return $json;
+// });
 /**********************************************/
 /*  Funciones de manejo de la clase Employee  */
 /**********************************************/
@@ -418,6 +517,39 @@ $app->delete('/location/{location_id}', function (Request $request, Response $re
                             JSON_FORCE_OBJECT);
     return $json;
 });
+
+
+/******************************************/
+/*  Funciones de manejo de la clase Price */
+/******************************************/
+$app->post('/price', function (Request $request, Response $response){
+    $preJSON = array(   'saved' => false,
+                        'price' => NULL );
+    $params = $request->getParsedBody();
+    $price = new Price();
+    $price->setHour($params['hour']);
+    $price->setHalf_day($params['half_day']);
+    $price->setDay($params['day']);
+
+    $saved_id = $price->save();
+    if($saved_id){
+        $price->setId($saved_id);
+        $preJSON['saved'] = true;
+        $preJSON['price'] = $price;
+    }
+    $json = json_encode($preJSON);
+    return $json;
+});
+
+
+
+
+
+
+
+
+
+
 
 
 

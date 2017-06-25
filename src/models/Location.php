@@ -115,20 +115,32 @@ class Location implements JsonSerializable{
 	}
     public static function getFreeUnreserved(){
 		$dba = DBAccess::getDBAccessObj();
-		$query = $dba->getQueryObj("SELECT L.*
-                                        FROM LOCATION AS L
-                                        LEFT JOIN PARKS AS P
-                                            ON L.ID = P.location_id
-                                        WHERE
-                                            reserved = 0
-                                            AND (
+		// $query = $dba->getQueryObj("SELECT L.*
+        //                                 FROM LOCATION AS L
+        //                                 LEFT JOIN PARKS AS P
+        //                                     ON L.ID = P.location_id
+        //                                 WHERE
+        //                                     reserved = 0
+        //                                     AND (
+        //                                         ISNULL(P.check_in)
+        //                                         OR
+        //                                         NOT ISNULL(P.check_in)
+        //                                         AND NOT ISNULL(P.check_out)
+        //                                     )
+        //                                 LIMIT 1;"
+        //                             );
+        $query = $dba->getQueryObj("    SELECT  L.*
+                                            FROM LOCATION AS L
+                                            LEFT JOIN
+                                                (SELECT * FROM PARKS WHERE ISNULL(check_out))AS P
+                                                    ON L.ID = P.location_id
+                                            WHERE
                                                 ISNULL(P.check_in)
-                                                OR
-                                                NOT ISNULL(P.check_in)
-                                                AND NOT ISNULL(P.check_out)
-                                            )
-                                        LIMIT 1;"
+                                            AND
+                                                reserved = 0
+                                                limit 1;"
                                     );
+
 		$query->execute();
         $location = $query->fetchAll(PDO::FETCH_CLASS, "Location");
         if (!isset($location[0])){
@@ -141,6 +153,31 @@ class Location implements JsonSerializable{
         return $location;
 	}
 
+    public static function getFreeReserved(){
+        $dba = DBAccess::getDBAccessObj();
+        $query = $dba->getQueryObj("    SELECT  L.*
+                                            FROM LOCATION AS L
+                                            LEFT JOIN
+                                                (SELECT * FROM PARKS WHERE ISNULL(check_out))AS P
+                                                    ON L.ID = P.location_id
+                                            WHERE
+                                                ISNULL(P.check_in)
+                                            AND
+                                                reserved = 1
+                                                limit 1;"
+                                    );
+
+        $query->execute();
+        $location = $query->fetchAll(PDO::FETCH_CLASS, "Location");
+        if (!isset($location[0])){
+            $location = null;
+        }
+        else{
+            $location = $location[0];
+        }
+        // vd( $location);die();
+        return $location;
+    }
 
     // </API methods **************************************
 

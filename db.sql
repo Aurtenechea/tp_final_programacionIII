@@ -9,7 +9,9 @@ CREATE TABLE CAR
   color VARCHAR(20) DEFAULT 'undefined',
   brand VARCHAR(50) DEFAULT 'undefined',
   owner_id BIGINT NOT NULL,
-  comment TINYTEXT
+  comment TINYTEXT,
+  disabled BOOLEAN NOT NULL DEFAULT FALSE
+
 );
 
 CREATE TABLE PERSON
@@ -46,6 +48,13 @@ CREATE TABLE EMPLOYEE
     state VARCHAR(15) NOT NULL DEFAULT 'active'
 );
 
+CREATE TABLE EMP_LOG
+(
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    emp_id INT NOT NULL,
+    log_in DATETIME DEFAULT NULL
+);
+
 CREATE TABLE PARKS
 (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -57,6 +66,8 @@ CREATE TABLE PARKS
     emp_id_chek_out INT DEFAULT NULL,
     cost NUMERIC(15,2) DEFAULT NULL
 );
+ SELECT * FROM PARKS WHERE car_id = 9 AND ISNULL(check_out) limit 1;
+
 
 CREATE TABLE CLIENT
 (
@@ -88,8 +99,12 @@ CREATE TABLE PRICE
   hour NUMERIC(15,2) DEFAULT 0,
   half_day NUMERIC(15,2) DEFAULT 0,
   day NUMERIC(15,2) DEFAULT 0,
-  on_date DATE DEFAULT NULL
+  on_date DATETIME DEFAULT NULL
 );
+
+insert into PRICE (hour, half_day, day, on_date) values (5,5,5,'2017-05-10 18:46:42');
+
+
 
 /* procedures to CAR */
 DELIMITER $$
@@ -122,27 +137,29 @@ shift
 password
 state
 
-SELECT *
-    FROM LOCATION AS L
-    LEFT JOIN PARKS AS P
-        ON L.id = P.location_id
-        WHERE
-            reserved = 0;
 
+INSERT INTO LOCATION (  floor,
+                        sector,
+                        number,
+                        reserved
+                    )
+                    VALUES (1,
+                            'B',
+                            '006',
+                            0
+                        );
 
-SELECT *
+SELECT  L.*
     FROM LOCATION AS L
-    LEFT JOIN PARKS AS P
-        ON L.ID = P.location_id
+    LEFT JOIN
+        (SELECT * FROM PARKS WHERE ISNULL(check_out))AS P
+            ON L.ID = P.location_id
     WHERE
+        ISNULL(P.check_in)
+    AND
         reserved = 0
-        AND (
-            ISNULL(P.check_in)
-            OR
-            NOT ISNULL(P.check_in)
-            AND NOT ISNULL(P.check_out)
-        )
-    LIMIT 1;
+        limit 1;
+
 
 DELETE FROM PARKS WHERE id = 5;
 
@@ -166,5 +183,8 @@ DROP PROCEDURE saveCar;
 INSERT INTO CAR(license, owner_id)
 VALUES
 ('sarasa', 36)
+INSERT INTO CAR(id, license, owner_id)
+VALUES
+(94, 'sarasa', 36)
 -- ('Vanina Strotsky', 20, 'vani@gmail.com'),
 -- ('Juliana Stroensberg', 27, 'juli@gmail.com')
