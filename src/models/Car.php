@@ -65,7 +65,6 @@ class Car implements JsonSerializable{
         }
         return $saved_id;
     }
-
     /*  trae de la base de datos todos los autos.
         @return  array de autos o null. */
     public static function getAll(){
@@ -80,7 +79,6 @@ class Car implements JsonSerializable{
         /*  devuelvo un array de autos o null */
         return $result;
     }
-
     /*  trae de la base de datos el auto con el id pasado como param.
         @return  un objeto auto o null. */
     public static function getFromId($car_id){
@@ -146,10 +144,5 @@ class Car implements JsonSerializable{
         $result = $query->rowCount() ? true : false;
 		return $result;
 	}
-
-
     // </API methods **************************************
-
-
-
 }

@@ -52,9 +52,6 @@ function search_car(){
     /*  ejecuta el ajax */
     parkCarAjax.then(callbackSucces, callbackError); // params: donecallbak, fail callback
 }
-
-
-
 /*  Se dispara cuando se quiere guardar un auto.
     - se envia un ajax para guardar el auto.
     - si este se guado se envia un ajax para guardar un parks.

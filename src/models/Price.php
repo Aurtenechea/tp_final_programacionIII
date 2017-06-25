@@ -33,26 +33,20 @@ class Price implements JsonSerializable{
 
     // <API methods **************************************
     public function save(){
-        try{
-            $dba = DBAccess::getDBAccessObj();
-            $query = $dba->getQueryObj("INSERT into PRICE (hour, half_day, day, on_date)
-                                            values (:hour,
-                                                    :half_day,
-                                                    :day,
-                                                    NOW()
-                                                );"
-                                        );
-            $query->bindValue(':hour',$this->hour, PDO::PARAM_STR);
-            $query->bindValue(':half_day',$this->half_day, PDO::PARAM_STR);
-    		$query->bindValue(':day',$this->day, PDO::PARAM_STR);
-            $query->execute();
-        }catch(Exception $e){
-            throw $e;
-        }
+        $dba = DBAccess::getDBAccessObj();
+        $query = $dba->getQueryObj("INSERT into PRICE (hour, half_day, day, on_date)
+                                        values (:hour,
+                                                :half_day,
+                                                :day,
+                                                NOW()
+                                            );"
+                                    );
+        $query->bindValue(':hour',$this->hour, PDO::PARAM_STR);
+        $query->bindValue(':half_day',$this->half_day, PDO::PARAM_STR);
+		$query->bindValue(':day',$this->day, PDO::PARAM_STR);
+        $query->execute();
         return $dba->returnLastInsertId();
     }
-
-
     /*  trae de la base de datos el auto con el id pasado como param.
         @return  un objeto auto o null. */
     public static function getPriceFromDate($datetime){
@@ -67,8 +61,6 @@ class Price implements JsonSerializable{
         $result = empty($result) ? null : $result[0];
         return $result;
     }
-
-
     /*  trae de la base de datos todos los autos.
         @return  array de autos o null. */
     public static function getAll(){
@@ -126,7 +118,4 @@ class Price implements JsonSerializable{
 		return $result;
 	}
     // </API methods **************************************
-
-
-
 }

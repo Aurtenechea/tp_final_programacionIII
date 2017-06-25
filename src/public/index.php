@@ -7,7 +7,6 @@ require '../../vendor/autoload.php';
 
 require_once('../models/Car.php');
 require_once('../models/Employee.php');
-require_once('../models/User.php');
 require_once('../models/Location.php');
 require_once('../models/Parks.php');
 require_once('../models/Price.php');
@@ -41,17 +40,6 @@ $app->get('/car/{car_license}', function (Request $request, Response $response){
     $json = json_encode( array('car' => $car) );
     return $json;
 });
-// $app->get('/car/{car_id}', function (Request $request, Response $response){
-//     $car_id = $request->getAttribute('car_id');
-//     /*  la funcion devuelve un array o null */
-//     $car = Car::getFromId($car_id);
-//     /*  devuelvo un json de un array con la clave 'cars' con un objeto
-//         auto o null. */
-//     $json = json_encode( array(  'car' => $car),
-//                             JSON_FORCE_OBJECT);
-//     return $json;
-//     // $response->getBody()->write("Hello, ");
-// });
 /*  devuelve un json con un buleano en updated y el auto modificado en car o null */
 $app->put('/car', function (Request $request, Response $response){
     $preJSON = array(   'updated' => false,
@@ -125,17 +113,6 @@ $app->get('/parks/still_in', function (Request $request, Response $response){
         /*  Recorre los parks y va creando cada objeto con los valores necesarios,
             reemplazando location id y car id por el objeto correspondiente. */
         foreach ($result as $item) {
-            // $stdClass = new stdClass();
-            // $stdClass->id = $item->getId();
-            // $stdClass->check_in = $item->getCheck_in();
-            // $stdClass->emp_chek_in = Employee::getFromId( $item->getEmp_id_chek_in() );
-            // $stdClass->car = Car::getFromId($item->getCar_id());
-            // $stdClass->location = Location::getFromId($item->getLocation_id());
-            // $responseArray[] = $stdClass;
-            // prueba
-            // $stdClass = new stdClass();
-            // $stdClass->id = $item->getId();
-            // $stdClass->check_in = $item->getCheck_in();
             $item->emp_chek_in = Employee::getFromId( $item->getEmp_id_chek_in() );
             $item->car = Car::getFromId($item->getCar_id());
             $item->location = Location::getFromId($item->getLocation_id());
@@ -148,7 +125,7 @@ $app->get('/parks/still_in', function (Request $request, Response $response){
     $result = json_encode(array('parks' => $responseArray));
     return $result;
 });
-/*  devuelve un json de un array de los autos que estan estacionados y no
+/*  devuelve un json de un array de los autos que estan estacionados y ya
     salieron. */
 $app->get('/parks/outed', function (Request $request, Response $response){
     /*  preseteo el array de respuesta. */
@@ -160,17 +137,6 @@ $app->get('/parks/outed', function (Request $request, Response $response){
         /*  Recorre los parks y va creando cada objeto con los valores necesarios,
             reemplazando location id y car id por el objeto correspondiente. */
         foreach ($result as $item) {
-            // $stdClass = new stdClass();
-            // $stdClass->id = $item->getId();
-            // $stdClass->check_in = $item->getCheck_in();
-            // $stdClass->emp_chek_in = Employee::getFromId( $item->getEmp_id_chek_in() );
-            // $stdClass->car = Car::getFromId($item->getCar_id());
-            // $stdClass->location = Location::getFromId($item->getLocation_id());
-            // $responseArray[] = $stdClass;
-            // prueba
-            // $stdClass = new stdClass();
-            // $stdClass->id = $item->getId();
-            // $stdClass->check_in = $item->getCheck_in();
             $item->emp_chek_in = Employee::getFromId( $item->getEmp_id_chek_in() );
             $item->car = Car::getFromId($item->getCar_id());
             $item->location = Location::getFromId($item->getLocation_id());
@@ -183,7 +149,8 @@ $app->get('/parks/outed', function (Request $request, Response $response){
     $result = json_encode(array('parks' => $responseArray));
     return $result;
 });
-/*  devuelve un json con un booleano en outed y el parks cerrado o null. */
+/*  es para sacar un auto del estacionamiento. devuelve un json con un booleano en
+    outed y el parks cerrado o null. */
 $app->get('/parks/out_car/license/{car_license}', function (Request $request, Response $response){
     /*  preseteo la respuesta. */
     $preJSON = array(   'outed' => false,
@@ -205,7 +172,7 @@ $app->get('/parks/out_car/license/{car_license}', function (Request $request, Re
     $json = json_encode($preJSON);
     return $json;
 });
-/*  devuelve un json con un booleano en outed y el parks cerrado o null. */
+/*  es para sacar un auto del estacionamiento. devuelve un json con un booleano en outed y el parks cerrado o null. */
 $app->get('/parks/out_car/{parks_id}', function (Request $request, Response $response){
     /*  preseteo la respuesta. */
     $preJSON = array(   'outed' => false,
@@ -251,7 +218,6 @@ $app->post('/parks', function (Request $request, Response $response){
             $car = Car::getFromLicense($params['license']);
         }
         $location = $car->getDisabled() ? Location::getFreeReserved() : Location::getFreeUnreserved();
-        // if($params['disabled'])
         if(!empty($car) && !empty($location)){
             $parks = new Parks();
             $parks->setCar_id($car->getId());
@@ -273,48 +239,12 @@ $app->post('/parks', function (Request $request, Response $response){
     $json = json_encode($preJSON);
     return $json;
 });
-// $app->post('/parks', function (Request $request, Response $response){
-//     $preJSON = array(   'saved'     => false,
-//                         'car'       => NULL,
-//                         'location'  => NULL,
-//                         'parks'     => NULL
-//                     );
-//     $params = $request->getParsedBody();
-//     $car = Car::getFromId($params['id']);
-//     // vd($car); die();
-//     $location = Location::getFreeUnreserved();
-//     // vd($location);
-//     if(isset($car) && isset($location)){
-//         $parks = new Parks();
-//         $parks->setCar_id($car->getId());
-//         $parks->setLocation_id($location->getId());
-//         $parks->setEmp_id_chek_in($_SESSION['id']);
-//         // $parks->setEmp_id_chek_in('14');
-//         $parks_insert_id = $parks->save();
-//         // vd($parks_insert_id); die();
-//         // si es cero no deberia traer nada.
-//         $parks = $parks->getFromId($parks_insert_id);
-//         // vd ($parks); die();
-//
-//         // y no deberia entrar aca.
-//         if(isset($parks)){
-//             // $parks->setId($saved_id);
-//             $preJSON['saved'] = true;
-//             $preJSON['car'] = $car;
-//             $preJSON['location'] = $location;
-//             $preJSON['parks'] = $parks;
-//         }
-//     }
-//     $json = json_encode($preJSON);
-//     return $json;
-// });
 /**********************************************/
 /*  Funciones de manejo de la clase Employee  */
 /**********************************************/
 $app->get('/employee', function (Request $request, Response $response){
     $employees = null;
     $employees = Employee::getAll();
-    // $response->getBody()->write("get para get all");
     $json = json_encode( array(  'employees' => $employees) );
     return $json;
 });
@@ -329,13 +259,10 @@ $app->get('/employee/check', function (Request $request, Response $response){
 $app->get('/employee/{employee_id}', function (Request $request, Response $response){
     $employee_id = $request->getAttribute('employee_id');
     $employee = Employee::getFromId($employee_id);
-    // var_dump($employee);
-    // $response->getBody()->write("Hello, ");
     $json = json_encode(    array(  'employee' => $employee),
                             JSON_FORCE_OBJECT);
     return $json;
 });
-
 $app->put('/employee', function (Request $request, Response $response){
     $preJSON = array(   'updated' => false,
                         'employee' => NULL );
@@ -348,7 +275,6 @@ $app->put('/employee', function (Request $request, Response $response){
     $employee->setPassword($params['password']);
     $employee->setState($params['state']);
     $updated_id=Employee::updateFromId($employee);
-    // $response->getBody()->write("Last_name" . $params['last_name']);
     if($updated_id){
         $preJSON['updated'] = true;
         $preJSON['employee'] = $employee;
@@ -361,9 +287,7 @@ $app->post('/employee', function (Request $request, Response $response){
     $preJSON = array(   'saved' => false,
                         'employee' => NULL );
     $params = $request->getParsedBody();
-    // vd($params);die();
     $employee = new Employee();
-    // $employee->setId($params['id']);
     $employee->setFirst_name($params['first_name']);
     $employee->setLast_name($params['last_name']);
     $employee->setEmail($params['email']);
@@ -371,7 +295,6 @@ $app->post('/employee', function (Request $request, Response $response){
     $employee->setPassword($params['password']);
     $employee->setState($params['state']);
     $saved_id = $employee->save();
-    // $response->getBody()->write("se inserto con el id: ".$saved_id);
     if($saved_id){
         $employee->setId($saved_id);
         $preJSON['saved'] = true;
@@ -390,7 +313,6 @@ $app->delete('/employee/{employee_id}', function (Request $request, Response $re
     if(isset($employee)){
         $deleted = Employee::deleteFromId($employee->getId());
     }
-    // $a = $response->getBody()->write("Hello, $employee_id");
     if($deleted){
         $preJSON['deleted'] = true;
         $preJSON['employee'] = $employee;
@@ -399,61 +321,38 @@ $app->delete('/employee/{employee_id}', function (Request $request, Response $re
                             JSON_FORCE_OBJECT);
     return $json;
 });
-
 /*  logueo de un empleado. */
 $app->post('/employee/verify', function (Request $request, Response $response){
     $preJSON = array(   'loged_in' => false,
                         'employee' => NULL );
     $params = $request->getParsedBody();
-    // vd($params);die();
     $employee = new Employee();
-    // $employee->setId($params['id']);
     $employee->setEmail($params['email']);
     $employee->setPassword($params['password']);
     $loged_id = $employee->verify($params['email'], $params['password']);
-    // $response->getBody()->write("se inserto con el id: ".$saved_id);
     if($loged_id){
-        // $employee->setId($saved_id);
         $preJSON['loged_in'] = true;
         $preJSON['employee'] = $employee;
     }
     $json = json_encode(  $preJSON);
     return $json;
 });
-
 $app->get('employee/logout', function (Request $request, Response $response){
-    // if (ini_get("session.use_cookies")) {
-    //     $params = session_get_cookie_params();
-    //     setcookie(session_name(), '', time() - 42000,
-    //         $params["path"], $params["domain"],
-    //         $params["secure"], $params["httponly"]
-    //     );
-    // }
     session_unset($_SESSION['loged_in']);
-    // $_SESSION['loged_in'] = false;
     session_destroy();
-    // header('location:http://localhost/utn/tp_final_programacionIII/server/php_mvc_framework_propio/public/employee/login/')
 });
-
-
-
-
 /**********************************************/
 /*  Funciones de manejo de la clase Location  */
 /**********************************************/
 $app->get('/location', function (Request $request, Response $response){
     $locations = null;
     $locations = Location::getAll();
-    // $response->getBody()->write("get para get all");
-    // vd($locations);
     $json = json_encode( array(  'locations' => $locations) );
     return $json;
 });
 $app->get('/location/{location_id}', function (Request $request, Response $response){
     $location_id = $request->getAttribute('location_id');
     $location = Location::getFromId($location_id);
-    // var_dump($location);
-    // $response->getBody()->write("Hello, ");
     $json = json_encode( array(  'location' => $location));
     return $json;
 });
@@ -467,38 +366,31 @@ $app->put('/location', function (Request $request, Response $response){
     $location->setNumber($params['number']);
     $location->setReserved($params['reserved']);
     $updated_id=Location::updateFromId($location);
-    // $response->getBody()->write("Last_name" . $params['sector']);
     if($updated_id){
         $preJSON['updated'] = true;
         $preJSON['location'] = $location;
     }
-    $json = json_encode(    $preJSON,
-                            JSON_FORCE_OBJECT);
+    $json = json_encode($preJSON);
     return $json;
 });
 $app->post('/location', function (Request $request, Response $response){
     $preJSON = array(   'saved' => false,
                         'location' => NULL );
     $params = $request->getParsedBody();
-    // vd($params);die();
     $location = new Location();
-    // $location->setId($params['id']);
     $location->setFloor($params['floor']);
     $location->setSector($params['sector']);
     $location->setNumber($params['number']);
     $location->setReserved($params['reserved']);
     $saved_id = $location->save();
-    // $response->getBody()->write("se inserto con el id: ".$saved_id);
     if($saved_id){
         $location->setId($saved_id);
         $preJSON['saved'] = true;
         $preJSON['location'] = $location;
     }
-    $json = json_encode(  $preJSON,
-                            JSON_FORCE_OBJECT);
+    $json = json_encode($preJSON);
     return $json;
 });
-
 $app->delete('/location/{location_id}', function (Request $request, Response $response){
     $preJSON = array(   'deleted' => false,
                         'location' => NULL );
@@ -508,17 +400,13 @@ $app->delete('/location/{location_id}', function (Request $request, Response $re
     if(isset($location)){
         $deleted = Location::deleteFromId($location->getId());
     }
-    // $a = $response->getBody()->write("Hello, $location_id");
     if($deleted){
         $preJSON['deleted'] = true;
         $preJSON['location'] = $location;
     }
-    $json = json_encode(    $preJSON,
-                            JSON_FORCE_OBJECT);
+    $json = json_encode($preJSON);
     return $json;
 });
-
-
 /******************************************/
 /*  Funciones de manejo de la clase Price */
 /******************************************/
@@ -530,7 +418,6 @@ $app->post('/price', function (Request $request, Response $response){
     $price->setHour($params['hour']);
     $price->setHalf_day($params['half_day']);
     $price->setDay($params['day']);
-
     $saved_id = $price->save();
     if($saved_id){
         $price->setId($saved_id);
@@ -540,115 +427,4 @@ $app->post('/price', function (Request $request, Response $response){
     $json = json_encode($preJSON);
     return $json;
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//
-//  HECHO EN CLASE
-//
-$app->post('/file', function (Request $request, Response $response){
-    // $preJSON = array(   'saved' => false,
-    //                     'location' => NULL );
-    // $params = $request->getParsedBody();
-    $files = $request->getUploadedFiles();
-
-    $stream = $files['file']->getStream();
-    $size = $files['file']->getSize();
-    $error = $files['file']->getError();
-    $filename = $files['file']->getClientFilename();
-    $mediaType = $files['file']->getClientMediaType();
-    $move = $files['file']->moveTo("/var/www/.temp_upload_php/sarasa.jpg");
-    $contentType = $request->getContentType();
-
-    echo('$files');
-    vd($files['file']);
-    echo('$stream');
-    vd($stream);
-    echo('$size');
-    vd($size);
-    echo('$error');
-    vd($error);
-    echo('$filename');
-    vd($filename);
-    echo('$mediaType');
-    vd($mediaType);
-    echo('$_FILES');
-    vd($_FILES);
-    echo('$move');
-    vd($move);
-    echo('$contentType');
-    vd($contentType);
-    die();
-    // $location = new Location();
-    // // $location->setId($params['id']);
-    // $location->setFloor($params['floor']);
-    // $location->setSector($params['sector']);
-    // $location->setNumber($params['number']);
-    // $location->setReserved($params['reserved']);
-    // $saved_id = $location->save();
-    // // $response->getBody()->write("se inserto con el id: ".$saved_id);
-    // if($saved_id){
-    //     $location->setId($saved_id);
-    //     $preJSON['saved'] = true;
-    //     $preJSON['location'] = $location;
-    // }
-    // $json = json_encode(  $preJSON,
-    //                         JSON_FORCE_OBJECT);
-    // return $json;
-});
-
-
-// /*****************************************/
-// /*  Funciones de manejo de la clase User */
-// /*****************************************/
-// $app->get('/user', function (Request $request, Response $response){
-//     $users = User::getAll();
-//     var_dump($users);
-//     $response->getBody()->write("get para get all: ". json_encode($users[0]));
-//     return $response;
-// });
-// $app->get('/user/{user_id}', function (Request $request, Response $response){
-//     $user_id = $request->getAttribute('user_id');
-//     $user = User::getFromId($user_id);
-//     var_dump($user);
-//     // $response->getBody()->write("Hello, ");
-//     return $response;
-// });
-// $app->put('/user', function (Request $request, Response $response){
-//     $params = $request->getParsedBody();
-//     $user = User::getFromId($params['id']);
-//     $user->setMail($params['mail']);
-//     $user->setPass($params['pass']);
-//     $user->setState($params['state']);
-//     User::updateFromId($user);
-//     return $response;
-// });
-// $app->post('/user', function (Request $request, Response $response){
-//     $params = $request->getParsedBody();
-//     $user = new User();
-//     $user->setMail($params['mail']);
-//     $user->setPass($params['pass']);
-//     $user->setState($params['state']);
-//     $saved_id = $user->save();
-//     $response->getBody()->write("se inserto con el id: ".$saved_id);
-//     return $response;
-// });
-// $app->delete('/user/{user_id}', function (Request $request, Response $response){
-//     $name = $request->getAttribute('name');
-//     $response->getBody()->write("Hello, $user_id");
-//     return $response;
-// });
-
-
 $app->run();

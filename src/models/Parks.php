@@ -135,7 +135,6 @@ class Parks implements JsonSerializable{
             return $total;
         }
     }
-
     /*  trae de la base de datos el parks con el id pasado como param.
         @return  un objeto auto o null. */
     public static function getFromId($parks_id){
@@ -149,7 +148,6 @@ class Parks implements JsonSerializable{
         $parks = empty($parks) ? null : $parks[0];
         return $parks;
     }
-
     /*  trae de la base de datos el parks con el id pasado como param.
         @return  un objeto auto o null. */
     public static function getFromLicense($car_license){
@@ -167,7 +165,6 @@ class Parks implements JsonSerializable{
         $parks = empty($parks) ? null : $parks[0];
         return $parks;
     }
-
     /*  trae de la base de datos los parks que no tengan fecha de salida con.
         @return  un array de autos o null. */
     public static function getAllStillIn(){
@@ -180,7 +177,6 @@ class Parks implements JsonSerializable{
         $result = empty($result) ? null : $result;
         return $result;
     }
-
     /*  devuelve un array de los ultimos 5 parks cerrados o null. */
     public static function getAllOuted(){
         $dba = DBAccess::getDBAccessObj();
@@ -209,61 +205,5 @@ class Parks implements JsonSerializable{
         $result = !empty($result) ? true : false;
         return $result;
     }
-    //
-    // public static function deleteFromId($parks_id){
-	// 	$dba = DBAccess::getDBAccessObj();
-	// 	$query = $dba->getQueryObj("DELETE FROM PARKS WHERE id = :id");
-	// 	$query->bindValue(':id',$parks_id, PDO::PARAM_INT);
-	// 	$query->execute();
-	// 	return $query->rowCount();
-	// }
-    // public static function updateFromId($user){
-	// 	$dba = DBAccess::getDBAccessObj();
-	// 	$query = $dba->getQueryObj("UPDATE PARKS
-    //                     				set
-    //                                         car_id=:car_id,
-    //                                         location_id=:location_id,
-    //                                         check_in=:check_in,
-    //                                         check_out=:check_out,
-    //                                         emp_id_chek_in=:emp_id_chek_in,
-    //                                         emp_id_chek_out=:emp_id_chek_out,
-    //                                         cost=:cost
-    //                     			    WHERE id=:id ;"
-    //                             );
-    //     $query->bindValue(':id', $user->getId(), PDO::PARAM_INT);
-	// 	$query->bindValue(':car_id', $user->getCar_id(), PDO::PARAM_INT);
-    //     $query->bindValue(':location_id', $user->getLocation_id(), PDO::PARAM_STR);
-    //     $query->bindValue(':check_in', $user->getCheck_in(), PDO::PARAM_STR);
-    //     $query->bindValue(':check_out', $user->getCheck_out(), PDO::PARAM_BOOL);
-    //     $query->bindValue(':emp_id_chek_in', $user->getEmp_id_chek_in(), PDO::PARAM_BOOL);
-    //     $query->bindValue(':emp_id_chek_out', $user->getEmp_id_chek_out(), PDO::PARAM_BOOL);
-    //     $query->bindValue(':cost', $user->getCost(), PDO::PARAM_BOOL);
-	// 	$query->execute();
-	// 	return $query->rowCount();
-	// }
-    // public static function getFreeUnreserved($user){
-	// 	$dba = DBAccess::getDBAccessObj();
-	// 	$query = $dba->getQueryObj("SELECT *
-    //                                     FROM PARKS AS L
-    //                                     LEFT JOIN PARKS AS P
-    //                                         ON L.ID = P.location_id
-    //                                     WHERE
-    //                                         reserved = 0
-    //                                         AND ISNULL(P.check_out)
-    //                                     limit 1;"
-    //                             );
-	// 	$query->execute();
-    //     $parks = $query->fetchAll(PDO::FETCH_CLASS, "Parks");
-    //     if (!isset($parks[0])){
-    //         $parks = null;
-    //     }
-    //     else{
-    //         $parks = $parks[0];
-    //     }
-    //     return $parks;
-	// }
-
-
     // </API methods **************************************
-
 }

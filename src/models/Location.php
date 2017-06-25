@@ -33,37 +33,23 @@ class Location implements JsonSerializable{
 
     // <API methods **************************************
     public function save(){
-        // vd($this);die();
-        try{
-            $dba = DBAccess::getDBAccessObj();
-            $query = $dba->getQueryObj("INSERT INTO LOCATION (  floor,
-                                                                sector,
-                                                                number,
-                                                                reserved
-                                                            )
-                                            VALUES (:floor,
-                                                    :sector,
-                                                    :number,
-                                                    :reserved
-                                                );"
-                                            );
-            $query->bindValue(':floor',$this->floor, PDO::PARAM_INT);
-            $query->bindValue(':sector',$this->sector, PDO::PARAM_STR);
-    		$query->bindValue(':number',$this->number, PDO::PARAM_STR);
-    		$query->bindValue(':reserved', $this->reserved, PDO::PARAM_BOOL);
-            $query->execute();
-
-            // $query = $dba->getQueryObj("select * from persona where dni = ".$this->dni);
-            // $query->execute();
-    		// $personaBuscada= $query->fetchObject('persona'); //devuelve una persona
-        }catch(Exception $e){
-            throw $e;
-        }
-        // $query = $dba->getQueryObj('select @last_insert_id_location;');
-        // $query->execute();
-        // $id = $query->fetch(PDO::FETCH_ASSOC);
-        // return $personaBuscada->id;
-
+        $dba = DBAccess::getDBAccessObj();
+        $query = $dba->getQueryObj("INSERT INTO LOCATION (  floor,
+                                                            sector,
+                                                            number,
+                                                            reserved
+                                                        )
+                                        VALUES (:floor,
+                                                :sector,
+                                                :number,
+                                                :reserved
+                                            );"
+                                        );
+        $query->bindValue(':floor',$this->floor, PDO::PARAM_INT);
+        $query->bindValue(':sector',$this->sector, PDO::PARAM_STR);
+		$query->bindValue(':number',$this->number, PDO::PARAM_STR);
+		$query->bindValue(':reserved', $this->reserved, PDO::PARAM_BOOL);
+        $query->execute();
         return $dba->returnLastInsertId();
     }
     public static function getAll(){
@@ -79,13 +65,7 @@ class Location implements JsonSerializable{
         $query->bindValue(':id',$location_id, PDO::PARAM_INT);
         $query->execute();
         $location = $query->fetchAll(PDO::FETCH_CLASS, "Location");
-        // vd($location);
-        if (!isset($location[0])){
-            $location = null;
-        }
-        else{
-            $location = $location[0];
-        }
+        $location = empty($location) ? null : $location[0];
         return $location;
     }
     public static function deleteFromId($location_id){
@@ -115,70 +95,39 @@ class Location implements JsonSerializable{
 	}
     public static function getFreeUnreserved(){
 		$dba = DBAccess::getDBAccessObj();
-		// $query = $dba->getQueryObj("SELECT L.*
-        //                                 FROM LOCATION AS L
-        //                                 LEFT JOIN PARKS AS P
-        //                                     ON L.ID = P.location_id
-        //                                 WHERE
-        //                                     reserved = 0
-        //                                     AND (
-        //                                         ISNULL(P.check_in)
-        //                                         OR
-        //                                         NOT ISNULL(P.check_in)
-        //                                         AND NOT ISNULL(P.check_out)
-        //                                     )
-        //                                 LIMIT 1;"
-        //                             );
-        $query = $dba->getQueryObj("    SELECT  L.*
-                                            FROM LOCATION AS L
-                                            LEFT JOIN
-                                                (SELECT * FROM PARKS WHERE ISNULL(check_out))AS P
-                                                    ON L.ID = P.location_id
-                                            WHERE
-                                                ISNULL(P.check_in)
-                                            AND
-                                                reserved = 0
-                                                limit 1;"
+        $query = $dba->getQueryObj("SELECT  L.*
+                                        FROM LOCATION AS L
+                                        LEFT JOIN
+                                            (SELECT * FROM PARKS WHERE ISNULL(check_out))AS P
+                                                ON L.ID = P.location_id
+                                        WHERE
+                                            ISNULL(P.check_in)
+                                        AND
+                                            reserved = 0
+                                            limit 1;"
                                     );
-
 		$query->execute();
         $location = $query->fetchAll(PDO::FETCH_CLASS, "Location");
-        if (!isset($location[0])){
-            $location = null;
-        }
-        else{
-            $location = $location[0];
-        }
-        // vd( $location);die();
+        $location = empty($location) ? null : $location[0];
         return $location;
 	}
-
     public static function getFreeReserved(){
         $dba = DBAccess::getDBAccessObj();
-        $query = $dba->getQueryObj("    SELECT  L.*
-                                            FROM LOCATION AS L
-                                            LEFT JOIN
-                                                (SELECT * FROM PARKS WHERE ISNULL(check_out))AS P
-                                                    ON L.ID = P.location_id
-                                            WHERE
-                                                ISNULL(P.check_in)
-                                            AND
-                                                reserved = 1
-                                                limit 1;"
+        $query = $dba->getQueryObj("SELECT  L.*
+                                        FROM LOCATION AS L
+                                        LEFT JOIN
+                                            (SELECT * FROM PARKS WHERE ISNULL(check_out))AS P
+                                                ON L.ID = P.location_id
+                                        WHERE
+                                            ISNULL(P.check_in)
+                                        AND
+                                            reserved = 1
+                                            limit 1;"
                                     );
-
         $query->execute();
         $location = $query->fetchAll(PDO::FETCH_CLASS, "Location");
-        if (!isset($location[0])){
-            $location = null;
-        }
-        else{
-            $location = $location[0];
-        }
-        // vd( $location);die();
+        $location = empty($location) ? null : $location[0];
         return $location;
     }
-
     // </API methods **************************************
-
 }
