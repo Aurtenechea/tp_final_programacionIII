@@ -7,6 +7,7 @@ require_once("lib.php");
 class Employee implements JsonSerializable{
     // <attr ----------------------------------------------------
     private $id;
+    private $rol;
     private $first_name;
     private $last_name;
     private $email;
@@ -17,6 +18,7 @@ class Employee implements JsonSerializable{
 
     // <getters and setters --------------------------------------
     public function getId() { return $this->id; }
+    public function getRol() { return $this->rol; }
     public function getFirst_name() { return $this->first_name; }
     public function getLast_name() { return $this->last_name; }
     public function getEmail() { return $this->email; }
@@ -24,6 +26,7 @@ class Employee implements JsonSerializable{
     public function getPassword() { return $this->password; }
     public function getState() { return $this->state; }
     public function setId($value) { $this->id = $value; }
+    public function setRol($value) { $this->rol = $value; }
     public function setFirst_name($value) { $this->first_name = $value; }
     public function setLast_name($value) { $this->last_name = $value; }
     public function setEmail($value) { $this->email = $value; }
@@ -40,19 +43,22 @@ class Employee implements JsonSerializable{
     // <API methods **************************************
     public function save(){
         $dba = DBAccess::getDBAccessObj();
-        $query = $dba->getQueryObj("INSERT INTO EMPLOYEE (  first_name,
+        $query = $dba->getQueryObj("INSERT INTO EMPLOYEE (  rol,
+                                                            first_name,
                                                             last_name,
                                                             email,
                                                             shift,
                                                             password,
                                                             state)
-                                        VALUES (:first_name,
+                                        VALUES (:rol,
+                                                :first_name,
                                                 :last_name,
                                                 :email,
                                                 :shift,
                                                 :password,
                                                 :state);"
                                         );
+        $query->bindValue(':rol',$this->rol, PDO::PARAM_STR);
         $query->bindValue(':first_name',$this->first_name, PDO::PARAM_STR);
         $query->bindValue(':last_name',$this->last_name, PDO::PARAM_STR);
         $query->bindValue(':email',$this->email, PDO::PARAM_STR);
@@ -67,6 +73,7 @@ class Employee implements JsonSerializable{
         $query = $dba->getQueryObj("SELECT * FROM EMPLOYEE;");
         $query->execute();
         $result = $query->fetchAll(PDO::FETCH_CLASS, "Employee");
+        $result = empty($result) ? null : $result;
         return $result;
     }
     public static function getFromId($employee_id){
@@ -90,6 +97,7 @@ class Employee implements JsonSerializable{
 		$dba = DBAccess::getDBAccessObj();
 		$query = $dba->getQueryObj("UPDATE EMPLOYEE
                         				set
+                                            rol=:rol,
                                             first_name=:first_name,
                                             last_name=:last_name,
                                             email=:email,
@@ -100,6 +108,7 @@ class Employee implements JsonSerializable{
                         			    WHERE id=:id ;"
                                 );
         $query->bindValue(':id', $user->getId(), PDO::PARAM_INT);
+        $query->bindValue(':rol', $user->getRol(), PDO::PARAM_STR);
 		$query->bindValue(':first_name', $user->getFirst_name(), PDO::PARAM_STR);
         $query->bindValue(':last_name', $user->getLast_name(), PDO::PARAM_STR);
         $query->bindValue(':email', $user->getEmail(), PDO::PARAM_STR);
@@ -123,11 +132,10 @@ class Employee implements JsonSerializable{
                 $_SESSION["shift"] = $employee->getShift();
                 $_SESSION["state"] = $employee->getState();
                 $_SESSION["password"] = $employee->getPassword();
+                $_SESSION["rol"] = $employee->getRol();
                 $dba = DBAccess::getDBAccessObj();
-                $query = $dba->getQueryObj("INSERT INTO EMP_LOG (
-                                                                    emp_id,
-                                                                    log_in
-                                                                )
+                $query = $dba->getQueryObj("INSERT INTO EMP_LOG (   emp_id,
+                                                                    log_in  )
                                                 VALUES (:emp_id,
                                                         NOW()
                                                     );"
@@ -143,6 +151,7 @@ class Employee implements JsonSerializable{
         if( isset($email) ){
             $dba = DBAccess::getDBAccessObj();
             $query = $dba->getQueryObj("SELECT  id,
+                                                rol,
                                                 first_name,
                                                 last_name,
                                                 email,

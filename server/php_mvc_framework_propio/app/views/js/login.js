@@ -35,7 +35,13 @@ function log(){
             al tablero de trabajo.
             SINO, SE DEBERIA MOSTRAR UN CARTEL DE ERROR */
         if( dataJson.loged_in ){
-            window.location.replace(root_url_server + "/home/dashboard/");
+            console.log(dataJson);
+            if(dataJson.employee.rol == 'admin'){
+                window.location.replace(root_url_server + "/home/admin_panel/");
+            }
+            else{
+                window.location.replace(root_url_server + "/home/dashboard/");
+            }
         }
         else{
             alert("Los datos no son correctos. Vuelve a intentarlo.");

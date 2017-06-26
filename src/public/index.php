@@ -149,7 +149,7 @@ $app->get('/parks/outed', function (Request $request, Response $response){
     $result = json_encode(array('parks' => $responseArray));
     return $result;
 });
-/*  es para sacar un auto del estacionamiento. devuelve un json con un booleano en
+/*  para sacar un auto del estacionamiento. devuelve un json con un booleano en
     outed y el parks cerrado o null. */
 $app->get('/parks/out_car/license/{car_license}', function (Request $request, Response $response){
     /*  preseteo la respuesta. */
@@ -172,7 +172,7 @@ $app->get('/parks/out_car/license/{car_license}', function (Request $request, Re
     $json = json_encode($preJSON);
     return $json;
 });
-/*  es para sacar un auto del estacionamiento. devuelve un json con un booleano en outed y el parks cerrado o null. */
+/*  sacar un auto del estacionamiento. devuelve un json con un booleano en outed y el parks cerrado o null. */
 $app->get('/parks/out_car/{parks_id}', function (Request $request, Response $response){
     /*  preseteo la respuesta. */
     $preJSON = array(   'outed' => false,
@@ -239,6 +239,34 @@ $app->post('/parks', function (Request $request, Response $response){
     $json = json_encode($preJSON);
     return $json;
 });
+
+/*  devuelve todos los parks. */
+$app->get('/parks', function (Request $request, Response $response){
+    /*  preseteo el array de respuesta. */
+    $responseArray = [];
+    /*  getAll devuelve un array de parks o bien null. */
+    $result = Parks::getAll();
+    /*  si no esta vacio lo recorro. */
+    if( !empty($result) ){
+        /*  Recorre los parks y va creando cada objeto con los valores necesarios,
+            reemplazando location id y car id por el objeto correspondiente. */
+        foreach ($result as $item) {
+            $item->emp_chek_in = Employee::getFromId( $item->getEmp_id_chek_in() );
+            $item->car = Car::getFromId($item->getCar_id());
+            $item->location = Location::getFromId($item->getLocation_id());
+            if(!empty($item->getEmp_id_chek_out())){
+                $item-> setEmp_id_chek_out( Employee::getFromId( $item->getEmp_id_chek_out() ));
+            }
+            $responseArray[] = $item;
+        }
+    }
+    $responseArray = empty($responseArray) ? null : $responseArray;
+    /*  devuelvo un json de un array con la clave 'parks' con un array
+        de parks o null. */
+    $result = json_encode(array('parks' => $responseArray));
+    return $result;
+});
+
 /**********************************************/
 /*  Funciones de manejo de la clase Employee  */
 /**********************************************/
@@ -259,8 +287,7 @@ $app->get('/employee/check', function (Request $request, Response $response){
 $app->get('/employee/{employee_id}', function (Request $request, Response $response){
     $employee_id = $request->getAttribute('employee_id');
     $employee = Employee::getFromId($employee_id);
-    $json = json_encode(    array(  'employee' => $employee),
-                            JSON_FORCE_OBJECT);
+    $json = json_encode(array('employee' => $employee));
     return $json;
 });
 $app->put('/employee', function (Request $request, Response $response){
@@ -288,6 +315,7 @@ $app->post('/employee', function (Request $request, Response $response){
                         'employee' => NULL );
     $params = $request->getParsedBody();
     $employee = new Employee();
+    $employee->setRol($params['rol']);
     $employee->setFirst_name($params['first_name']);
     $employee->setLast_name($params['last_name']);
     $employee->setEmail($params['email']);
@@ -300,8 +328,7 @@ $app->post('/employee', function (Request $request, Response $response){
         $preJSON['saved'] = true;
         $preJSON['employee'] = $employee;
     }
-    $json = json_encode(  $preJSON,
-                            JSON_FORCE_OBJECT);
+    $json = json_encode($preJSON);
     return $json;
 });
 $app->delete('/employee/{employee_id}', function (Request $request, Response $response){
@@ -331,6 +358,8 @@ $app->post('/employee/verify', function (Request $request, Response $response){
     $employee->setPassword($params['password']);
     $loged_id = $employee->verify($params['email'], $params['password']);
     if($loged_id){
+        $employee = Employee::getFromEmail($employee->getEmail());
+        $employee->setPassword('');
         $preJSON['loged_in'] = true;
         $preJSON['employee'] = $employee;
     }

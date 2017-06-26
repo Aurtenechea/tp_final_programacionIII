@@ -27,6 +27,12 @@ class HomeController
         Response::render('dashboard', []);
     }
 
+    /*  ESTA FUNCION NO DEBERIA VERIFICAR NADA, SIMPLEMENTE CONTESTAR LA PETICION
+        ES EL .js EL QUE VA A VERIFICAR CON LA API Y REDICCIONAR SI ES NECESARIO. */
+    public function actionAdmin_panel(){
+        Response::render('admin_panel', []);
+    }
+
     public function actionAbout(){
         echo "Hola desde el about";
     }

@@ -40,6 +40,7 @@ CREATE TABLE LOCATION
 CREATE TABLE EMPLOYEE
 (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    rol VARCHAR(30) DEFAULT 'undefined',
     first_name VARCHAR(30) DEFAULT 'undefined',
     last_name VARCHAR(30) DEFAULT 'undefined',
     email VARCHAR(50) NOT NULL DEFAULT 'undefined',
@@ -47,6 +48,10 @@ CREATE TABLE EMPLOYEE
     password VARCHAR(20) NOT NULL DEFAULT 'pass',
     state VARCHAR(15) NOT NULL DEFAULT 'active'
 );
+
+insert  into EMPLOYEE   (rol,   first_name, last_name,  email, shift, password, state)
+        values          ('admin',     'nacho','aurtenechea','admin', 'noche','admin','active');
+
 
 CREATE TABLE EMP_LOG
 (
@@ -103,6 +108,7 @@ CREATE TABLE PRICE
 );
 
 insert into PRICE (hour, half_day, day, on_date) values (5,5,5,'2017-05-10 18:46:42');
+
 
 
 

@@ -177,6 +177,18 @@ class Parks implements JsonSerializable{
         $result = empty($result) ? null : $result;
         return $result;
     }
+
+    /*  trae de la base de datos todos los parks.
+        @return  un array de autos o null. */
+    public static function getAll(){
+        $dba = DBAccess::getDBAccessObj();
+        $query = $dba->getQueryObj("SELECT * FROM PARKS;");
+        $query->execute();
+        $result = $query->fetchAll(PDO::FETCH_CLASS, "Parks");
+        /*  si es un array vacio asiganarle null sino dejar el array */
+        $result = empty($result) ? null : $result;
+        return $result;
+    }
     /*  devuelve un array de los ultimos 5 parks cerrados o null. */
     public static function getAllOuted(){
         $dba = DBAccess::getDBAccessObj();
