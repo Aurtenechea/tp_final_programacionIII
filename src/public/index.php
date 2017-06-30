@@ -11,7 +11,10 @@ require_once('../models/Location.php');
 require_once('../models/Parks.php');
 require_once('../models/Price.php');
 
-$app = new \Slim\App;
+$config['displayErrorDetails'] = true;
+$config['addContentLengthHeader'] = false;
+
+$app = new \Slim\App(["settings" => $config]);
 session_start();
 
 /****************************************/
@@ -246,6 +249,7 @@ $app->get('/parks', function (Request $request, Response $response){
     $responseArray = [];
     /*  getAll devuelve un array de parks o bien null. */
     $result = Parks::getAll();
+    vd($result);
     /*  si no esta vacio lo recorro. */
     if( !empty($result) ){
         /*  Recorre los parks y va creando cada objeto con los valores necesarios,
@@ -270,6 +274,19 @@ $app->get('/parks', function (Request $request, Response $response){
 /**********************************************/
 /*  Funciones de manejo de la clase Employee  */
 /**********************************************/
+$app->post('/employee/suspend', function (Request $request, Response $response){
+    // $employee_id = $request->getAttribute('employee_id');
+    $params = $request->getParsedBody();
+    $employee = Employee::getFromEmail($params['email']);
+    $employee->setState('suspend');
+    $result = Employee::updateFromId($employee);
+    /*  si se suspendio, osea se modifico el empleado, volver a
+        traerlo de la db. */
+    $employee = $result ? Employee::getFromEmail($params['email']) : $employee;
+    $json = json_encode(array('employee' => $employee));
+    return $json;
+});
+
 $app->get('/employee', function (Request $request, Response $response){
     $employees = null;
     $employees = Employee::getAll();
@@ -290,6 +307,7 @@ $app->get('/employee/{employee_id}', function (Request $request, Response $respo
     $json = json_encode(array('employee' => $employee));
     return $json;
 });
+
 $app->put('/employee', function (Request $request, Response $response){
     $preJSON = array(   'updated' => false,
                         'employee' => NULL );

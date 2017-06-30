@@ -50,7 +50,7 @@ CREATE TABLE EMPLOYEE
 );
 
 insert  into EMPLOYEE   (rol,   first_name, last_name,  email, shift, password, state)
-        values          ('admin',     'nacho','aurtenechea','admin', 'noche','admin','active');
+        values          ('employee', 'pepe','garcia','pepe', 'noche','pepe','active');
 
 
 CREATE TABLE EMP_LOG

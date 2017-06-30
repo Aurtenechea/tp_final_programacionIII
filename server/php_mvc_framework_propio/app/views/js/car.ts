@@ -1,0 +1,5 @@
+declare var $ :any;
+
+class{
+
+}

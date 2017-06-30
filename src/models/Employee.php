@@ -123,7 +123,7 @@ class Employee implements JsonSerializable{
         $_SESSION["loged_in"] = false;
         if( isset($email) && isset($password)){
             $employee = self::getFromEmail($email);
-            if(isset($employee) && $employee->getPassword() == $password){
+            if(isset($employee) && $employee->getPassword() == $password && $employee->getState() == "active"){
                 $_SESSION["loged_in"] = true;
                 $_SESSION["id"] = $employee->getId();
                 $_SESSION["email"] = $email;
