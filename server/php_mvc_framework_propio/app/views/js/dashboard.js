@@ -273,7 +273,6 @@ function check_loged_in(){
     parkCarAjax.then(callbackSucces, callbackError);
 };
 
-
 /*  Esta funcion hace una peticion a la api para que si NO esta
     logueado el usuario vaya directo al login. */
 function outCarFromLicense(){

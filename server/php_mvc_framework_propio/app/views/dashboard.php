@@ -22,6 +22,12 @@
 
         <!-- scripts -->
         <script src="http://localhost/utn/tp_final_programacionIII/server/php_mvc_framework_propio/app/views/js/dashboard.js"></script>
+        <!-- scripts typescript test -->
+        <script src="http://localhost/utn/tp_final_programacionIII/server/php_mvc_framework_propio/app/views/js/typescript/routes.js"></script>
+        <script src="http://localhost/utn/tp_final_programacionIII/server/php_mvc_framework_propio/app/views/js/typescript/ajax.js"></script>
+        <!-- <script src="http://localhost/utn/tp_final_programacionIII/server/php_mvc_framework_propio/app/views/js/typescript/lib.js"></script> -->
+        <script src="http://localhost/utn/tp_final_programacionIII/server/php_mvc_framework_propio/app/views/js/typescript/car.js"></script>
+        <script src="http://localhost/utn/tp_final_programacionIII/server/php_mvc_framework_propio/app/views/js/typescript/test.js"></script>
 
     </head>
     <body>

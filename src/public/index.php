@@ -5,11 +5,15 @@ use \Psr\Http\Message\ResponseInterface as Response;
 
 require '../../vendor/autoload.php';
 
+require_once '../models/lib.php';
 require_once('../models/Car.php');
 require_once('../models/Employee.php');
 require_once('../models/Location.php');
 require_once('../models/Parks.php');
 require_once('../models/Price.php');
+require_once '../models/JWToken.php';
+require_once '../models/MWAuthorizer.php';
+
 
 $config['displayErrorDetails'] = true;
 $config['addContentLengthHeader'] = false;
