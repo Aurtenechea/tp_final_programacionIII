@@ -4,7 +4,6 @@ class MWAuthorizer{
 
 	public function userVerification($request, $response, $next) {
 		// $response->getBody()->write('Ejecucion del MW. Pre funcion.');
-		// $request = $request->withAttribute('foo', 'value');
 		// $response = $next($request, $response);
 		// $response->getBody()->write('Ejecucion del MW.');
 		$headers = getallheaders();
@@ -22,6 +21,8 @@ class MWAuthorizer{
 	    try{
 			JWToken::verify($token);
 			$validation = true;
+			$data = JWToken::getData($token);
+			$request = $request->withAttribute('employee', $data);
 	    }
 	    catch (Exception $e) {
 			// echo($e);
