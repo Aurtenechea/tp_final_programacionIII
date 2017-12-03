@@ -8,6 +8,7 @@ check_loged_in();
 
 /*  */
 $(document).ready(function() {
+  console.log("hola");
     $("#park_button").click(park);
     $("#logout_button").click(logout);
     $("#fillCarsList_button").click( function(){
@@ -32,6 +33,9 @@ function search_car(){
             type: 'GET',
             url: url,
             data: params,
+            headers: {
+                "Authorization":"Bearer " + localStorage.getItem('jwt')
+            }
         }
     );
     var callbackSucces = function( data ){
@@ -43,7 +47,6 @@ function search_car(){
             // alert(dataJson.car.disabled);
             $('#disabled_parking_place').prop('checked',(dataJson.car.disabled == 1))
         }
-
     };
     /*  CALLBACK ERROR de crear un auto */
     function callbackError(error){
@@ -80,6 +83,9 @@ function park(){
             type: 'POST',
             url: url,
             data: params,
+            headers: {
+                "Authorization":"Bearer " + localStorage.getItem('jwt')
+            }
         }
     );
     /*  CALLBACK SUCCES de crear un auto. Si se guardo hace un ajax para crear
@@ -110,6 +116,9 @@ function fillCarsList(){
         {
             type: 'GET',
             url: url,
+            headers: {
+                "Authorization":"Bearer " + localStorage.getItem('jwt')
+            }
         }
     );
     var ajaxSucces = function( data ){
@@ -164,6 +173,9 @@ function fillOutedCarsList(){
         {
             type: 'GET',
             url: url,
+            headers: {
+                "Authorization":"Bearer " + localStorage.getItem('jwt')
+            }
         }
     );
     var ajaxSucces = function( data ){
@@ -207,7 +219,10 @@ function logout(){
     var ajax = $.ajax(
         {
             type: 'GET',
-            url: url
+            url: url,
+            headers: {
+                "Authorization":"Bearer " + localStorage.getItem('jwt')
+            }
         }
     );
 
@@ -232,7 +247,10 @@ function outCar(){
         var ajax = $.ajax(
             {
                 type: 'GET',
-                url: url
+                url: url,
+                headers: {
+                    "Authorization":"Bearer " + localStorage.getItem('jwt')
+                }
             }
         );
         var ajaxSucces = function( data ){
@@ -255,12 +273,18 @@ function check_loged_in(){
         {
             type: 'GET',
             url: url,
+            headers: {
+                "Authorization":"Bearer " + localStorage.getItem('jwt')
+            }
         }
     );
     /*  CALLBACK SUCCES. Si se dispara y se creo el parks, setea el result a true. */
     var callbackSucces = function( data ){
         console.log(data);
-        dataJson = JSON.parse(data);
+        debugger;
+        // dataJson = JSON.parse(data);
+        let dataJson = data;
+
         if(!dataJson.loged_in){
             window.location.replace(root_url_server + "/user/login/");
         }
@@ -284,6 +308,9 @@ function outCarFromLicense(){
         {
             type: 'GET',
             url: url,
+            headers: {
+                "Authorization":"Bearer " + localStorage.getItem('jwt')
+            }
         }
     );
     /*  CALLBACK SUCCES. */

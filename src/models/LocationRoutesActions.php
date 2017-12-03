@@ -66,4 +66,32 @@ class LocationRoutesActions
         $json = json_encode($preJSON);
         return $json;
     }
+
+
+
+    public function getMostUsed($request, $response, $args) {
+        $preJSON = array( 'location' => NULL );
+        $location = Location::getMostUsed();
+        if(isset($location)){
+            $deleted = Location::deleteFromId($location->getId());
+        }
+        if($deleted){
+            $preJSON['deleted'] = true;
+            $preJSON['location'] = $location;
+        }
+        $json = json_encode($preJSON);
+        return $json;
+    }
+
+    // public static function getFromId($employee_id){
+    //   $dba = DBAccess::getDBAccessObj();
+    //   $query = $dba->getQueryObj("SELECT * FROM EMPLOYEE WHERE id = :id");
+    //   $query->bindValue(':id',$employee_id, PDO::PARAM_INT);
+    //   $query->execute();
+    //   $result = $query->fetchAll(PDO::FETCH_CLASS, "Employee");
+    //   /*  si es un array vacio asiganarle null sino dejar el array */
+    //   $result = empty($result) ? null : $result[0];
+    //   return $result;
+    // }
+
 }

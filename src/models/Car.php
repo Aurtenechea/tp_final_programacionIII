@@ -21,14 +21,14 @@ class Car implements JsonSerializable{
     public function getLicense() { return $this->license; }
     public function getColor() { return $this->color; }
     public function getBrand() { return $this->brand; }
-    public function getOwner_id() { return $this->owner_id; }
+    // public function getOwner_id() { return $this->owner_id; }
     public function getComment() { return $this->comment; }
     public function getDisabled() { return $this->disabled; }
     public function setId($value) { $this->id = $value; }
     public function setLicense($value) { $this->license = $value; }
     public function setColor($value) { $this->color = $value; }
     public function setBrand($value) { $this->brand = $value; }
-    public function setOwner_id($value) { $this->owner_id = $value; }
+    // public function setOwner_id($value) { $this->owner_id = $value; }
     public function setComment($value) { $this->comment = $value; }
     public function setDisabled($value) { $this->disabled = $value; }
     // </getters and setters --------------------------------------
@@ -44,24 +44,24 @@ class Car implements JsonSerializable{
         $saved_id = 0;
         $car = Car::getFromLicense($this->license);
         if(empty($car)){
-            $dba = DBAccess::getDBAccessObj();
-            $query = $dba->getQueryObj("INSERT into CAR (license, color, brand, owner_id, comment, disabled)
-                                            values (:license,
-                                                    :color,
-                                                    :brand,
-                                                    :owner_id,
-                                                    :comment,
-                                                    :disabled
-                                                );"
-                                        );
-            $query->bindValue(':license',$this->license, PDO::PARAM_STR);
-            $query->bindValue(':color',$this->color, PDO::PARAM_STR);
-    		$query->bindValue(':brand',$this->brand, PDO::PARAM_STR);
-    		$query->bindValue(':owner_id', $this->owner_id, PDO::PARAM_INT);
-            $query->bindValue(':comment', $this->comment, PDO::PARAM_STR);
-    		$query->bindValue(':disabled', $this->disabled, PDO::PARAM_BOOL);
-            $query->execute();
-            $saved_id = $dba->returnLastInsertId();
+          $dba = DBAccess::getDBAccessObj();
+          $query = $dba->getQueryObj("INSERT into CAR (license, color, brand, comment, disabled)
+                                          values (:license,
+                                                  :color,
+                                                  :brand,
+                                                  :comment,
+                                                  :disabled
+                                              );"
+                                      );
+          $query->bindValue(':license',$this->license, PDO::PARAM_STR);
+          $query->bindValue(':color',$this->color, PDO::PARAM_STR);
+          $query->bindValue(':brand',$this->brand, PDO::PARAM_STR);
+          // no va mas
+          // $query->bindValue(':owner_id', $this->owner_id, PDO::PARAM_INT);
+          $query->bindValue(':comment', $this->comment, PDO::PARAM_STR);
+          $query->bindValue(':disabled', $this->disabled, PDO::PARAM_BOOL);
+          $query->execute();
+          $saved_id = $dba->returnLastInsertId();
         }
         return $saved_id;
     }
@@ -129,19 +129,18 @@ class Car implements JsonSerializable{
                                             license = :license,
                                             color = :color,
                                             brand = :brand,
-                                            owner_id = :owner_id,
                                             comment = :comment,
                                             disabled = :disabled
                         			    WHERE id = :id ;"
                                 );
-        $query->bindValue(':id', $car->getId(), PDO::PARAM_INT);
-		$query->bindValue(':license', $car->getLicense(), PDO::PARAM_STR);
-        $query->bindValue(':color', $car->getColor(), PDO::PARAM_STR);
-        $query->bindValue(':brand', $car->getBrand(), PDO::PARAM_STR);
-        $query->bindValue(':owner_id', $car->getOwner_id(), PDO::PARAM_INT);
-        $query->bindValue(':disabled', $car->getdisabled(), PDO::PARAM_BOOL);
-		$query->execute();
-        $result = $query->rowCount() ? true : false;
+      $query->bindValue(':id', $car->getId(), PDO::PARAM_INT);
+      $query->bindValue(':license', $car->getLicense(), PDO::PARAM_STR);
+      $query->bindValue(':color', $car->getColor(), PDO::PARAM_STR);
+      $query->bindValue(':brand', $car->getBrand(), PDO::PARAM_STR);
+      $query->bindValue(':comment', $car->getComment(), PDO::PARAM_STR);
+      $query->bindValue(':disabled', $car->getdisabled(), PDO::PARAM_BOOL);
+      $query->execute();
+      $result = $query->rowCount() ? true : false;
 		return $result;
 	}
     // </API methods **************************************

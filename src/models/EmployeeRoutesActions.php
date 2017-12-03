@@ -15,14 +15,13 @@ class EmployeeRoutesActions
     }
 
     public function check($request, $response, $args) {
-        $log = array(  'loged_in' => false );
-        if( isset($_SESSION['loged_in']) && $_SESSION['loged_in'] ){
-            $log['loged_in'] = true;
-        }
-        $json = json_encode($log);
-        return $json;
+        $employee = $request->getAttribute('employee');
+        $preJSON = array(   'loged_in' => true,
+                            'employee' => $employee );
+        $response = $response->withJson($preJSON);
+        return $response;
     }
-    //
+
     public function getFromId($request, $response, $args) {
         $employee_id = $request->getAttribute('employee_id');
         $employee = Employee::getFromId($employee_id);
@@ -40,6 +39,8 @@ class EmployeeRoutesActions
         $preJSON = array(   'updated' => false,
                             'employee' => NULL );
         $params = $request->getParsedBody();
+        $employee_id = $request->getAttribute('employee_id');
+
         $employee = Employee::getFromId($params['id']);
         $employee->setFirst_name($params['first_name']);
         $employee->setLast_name($params['last_name']);
@@ -47,7 +48,7 @@ class EmployeeRoutesActions
         $employee->setShift($params['shift']);
         $employee->setPassword($params['password']);
         $employee->setState($params['state']);
-        $updated_id=Employee::updateFromId($employee);
+        $updated_id = Employee::updateFromId($employee);
         if($updated_id){
             $preJSON['updated'] = true;
             $preJSON['employee'] = $employee;
@@ -58,6 +59,7 @@ class EmployeeRoutesActions
     }
 
     public function save($request, $response, $args) {
+        // return 'hola';
         $preJSON = array(   'saved' => false,
                             'employee' => NULL );
         $params = $request->getParsedBody();
@@ -101,11 +103,15 @@ class EmployeeRoutesActions
         $preJSON = array(   'loged_in' => false,
                             'employee' => NULL );
         $params = $request->getParsedBody();
+        // echo('hola');
+        // vd($params);die;
         $employee = new Employee();
         $employee->setEmail($params['email']);
         $employee->setPassword($params['password']);
         $loged_id = $employee->verify($params['email'], $params['password']);
         if($loged_id){
+            // $employee->saveLog();
+
             $employee = Employee::getFromEmail($employee->getEmail());
             $employee->setPassword('');
             $empJson = json_encode($employee);
@@ -115,7 +121,7 @@ class EmployeeRoutesActions
             $preJSON['jwt'] = $token;
             $preJSON['employee'] = $employee;
         }
-        $json = json_encode(  $preJSON);
+        $json = json_encode($preJSON);
         return $json;
     }
 

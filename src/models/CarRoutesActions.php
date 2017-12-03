@@ -31,8 +31,9 @@ class CarRoutesActions
         $car->setLicense($params['license']);
         $car->setColor($params['color']);
         $car->setBrand($params['brand']);
-        $car->setOwner_id($params['owner_id']);
+        // $car->setOwner_id($params['owner_id']);
         $car->setComment($params['comment']);
+        $car->setDisabled($params['disabled']);
         $updated_id = Car::updateFromId($car);
         if($updated_id){
             $preJSON['updated'] = true;
@@ -54,8 +55,8 @@ class CarRoutesActions
         $car->setDisabled($params['disabled']);
         // $car->setOwner_id($_SESSION['id']); // el id del empleado.
 
-        $employee = $request->getAttribute('employee');
-        $car->setOwner_id($employee['id']); // el id del empleado.
+        // $employee = $request->getAttribute('employee');
+        // $car->setOwner_id($employee['id']); // el id del empleado.
 
         $saved_id = $car->save();
         if($saved_id){

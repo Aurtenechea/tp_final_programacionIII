@@ -1,4 +1,5 @@
 <?php
+// Disponibilidad para trabajar inmediata.
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
@@ -26,7 +27,8 @@ $app = new \Slim\App(["settings" => $config]);
 session_start();
 
 
-$app->add(\MWAuthorizer::class . ':userVerification');
+// $app->add(\MWAuthorizer::class . ':userVerification');
+// ->add(\MWAuthorizer::class . ':userVerification');
 
 /****************************************/
 /*  Funciones de manejo de la clase Car */
@@ -42,7 +44,7 @@ $app->group('/car', function(){
     $this->post('[/]', \CarRoutesActions::class . ':save');
     /*  devuelve un json con un booleado en deleted y el auto borrado. */
     $this->delete('/{car_id}[/]', \CarRoutesActions::class . ':deleteFromId');
-});
+})->add(\MWAuthorizer::class . ':userVerification');
 
 /*******************************************/
 /*  Funciones de manejo de la clase Parks  */
@@ -65,165 +67,43 @@ $app->group('/parks', function(){
     $this->post('[/]', \ParksRoutesActions::class . ':save');
     /*  devuelve todos los parks. */
     $this->get('[/]', \ParksRoutesActions::class . ':getAll');
+    /*  devuelve un json de un park o null */
+    $this->get('/{parks_id}[/]', \ParksRoutesActions::class . ':getFromId');
 
-});
+    $this->delete('/{parks_id}[/]', \ParksRoutesActions::class . ':deleteFromId');
+
+    // TODO, borrar
+    // esto esta aca solo para testear el calculateCost a travez de
+    // get -> parks/test_price/:parks_id
+    $this->get('/test_price/{parks_id}[/]', \ParksRoutesActions::class . ':calculateCost');
+
+
+})->add(\MWAuthorizer::class . ':userVerification');
 
 /**********************************************/
 /*  Funciones de manejo de la clase Employee  */
 /**********************************************/
 $app->group('/employee', function () {
-    // $this->post('/suspend', function (Request $request, Response $response){
-    //     // $employee_id = $request->getAttribute('employee_id');
-    //     $params = $request->getParsedBody();
-    //     $employee = Employee::getFromEmail($params['email']);
-    //     $employee->setState('suspend');
-    //     $result = Employee::updateFromId($employee);
-    //     /*  si se suspendio, osea se modifico el empleado, volver a
-    //         traerlo de la db. */
-    //     $employee = $result ? Employee::getFromEmail($params['email']) : $employee;
-    //     $json = json_encode(array('employee' => $employee));
-    //     return $json;
-    // });
-    $this->post('/suspend[/]', \EmployeeRoutesActions::class . ':suspendEmployeeFromEmail');
+    $this->post('/suspend[/]', \EmployeeRoutesActions::class . ':suspendEmployeeFromEmail')->add(\MWAuthorizer::class . ':userVerification');
 
-    $this->get('/logout', function (Request $request, Response $response){
-        session_unset($_SESSION['loged_in']);
-        session_destroy();
-    });
+    // $this->get('/logout', function (Request $request, Response $response){
+    //     session_unset($_SESSION['loged_in']);
+    //     session_destroy();
+    // })->add(\MWAuthorizer::class . ':userVerification');
 
-    // $this->get('/check', function (Request $request, Response $response){
-    //     $log = array(  'loged_in' => false );
-    //     if( isset($_SESSION['loged_in']) && $_SESSION['loged_in'] ){
-    //         $log['loged_in'] = true;
-    //     }
-    //     $json = json_encode($log);
-    //     return $json;
-    // });
-    $this->get('/check[/]', \EmployeeRoutesActions::class . ':check');
+    $this->get('/check[/]', \EmployeeRoutesActions::class . ':check')->add(\MWAuthorizer::class . ':userVerification');
 
-    // $this->get('/{employee_id}', function (Request $request, Response $response){
-    //     $employee_id = $request->getAttribute('employee_id');
-    //     $employee = Employee::getFromId($employee_id);
-    //     $json = json_encode(array('employee' => $employee));
-    //     return $json;
-    // });
-    $this->get('/{employee_id}[/]', \EmployeeRoutesActions::class . ':getFromId');
+    $this->get('/{employee_id}[/]', \EmployeeRoutesActions::class . ':getFromId')->add(\MWAuthorizer::class . ':userVerification');
 
+    $this->get('[/]', \EmployeeRoutesActions::class . ':getAll')->add(\MWAuthorizer::class . ':userVerification');
 
-    // $this->get('', function (Request $request, Response $response){
-    //     $employees = null;
-    //     $employees = Employee::getAll();
-    //     $json = json_encode( array(  'employees' => $employees) );
-    //     return $json;
-    // });
-    $this->get('[/]', \EmployeeRoutesActions::class . ':getAll');
+    $this->put('[/]', \EmployeeRoutesActions::class . ':updateFromId')->add(\MWAuthorizer::class . ':userVerification');
 
-    // $this->put('', function (Request $request, Response $response){
-    //     $preJSON = array(   'updated' => false,
-    //                         'employee' => NULL );
-    //     $params = $request->getParsedBody();
-    //     $employee = Employee::getFromId($params['id']);
-    //     $employee->setFirst_name($params['first_name']);
-    //     $employee->setLast_name($params['last_name']);
-    //     $employee->setEmail($params['email']);
-    //     $employee->setShift($params['shift']);
-    //     $employee->setPassword($params['password']);
-    //     $employee->setState($params['state']);
-    //     $updated_id=Employee::updateFromId($employee);
-    //     if($updated_id){
-    //         $preJSON['updated'] = true;
-    //         $preJSON['employee'] = $employee;
-    //     }
-    //     $json = json_encode(    $preJSON,
-    //                             JSON_FORCE_OBJECT);
-    //     return $json;
-    // });
-    $this->put('[/]', \EmployeeRoutesActions::class . ':updateFromId');
+    $this->post('[/]', \EmployeeRoutesActions::class . ':save')->add(\MWAuthorizer::class . ':userVerification');
 
-    // $this->post('', function (Request $request, Response $response){
-    //     $preJSON = array(   'saved' => false,
-    //                         'employee' => NULL );
-    //     $params = $request->getParsedBody();
-    //     $employee = new Employee();
-    //     $employee->setRol($params['rol']);
-    //     $employee->setFirst_name($params['first_name']);
-    //     $employee->setLast_name($params['last_name']);
-    //     $employee->setEmail($params['email']);
-    //     $employee->setShift($params['shift']);
-    //     $employee->setPassword($params['password']);
-    //     $employee->setState($params['state']);
-    //     $saved_id = $employee->save();
-    //     if($saved_id){
-    //         $employee->setId($saved_id);
-    //         $preJSON['saved'] = true;
-    //         $preJSON['employee'] = $employee;
-    //     }
-    //     $json = json_encode($preJSON);
-    //     return $json;
-    // });
-    $this->post('[/]', \EmployeeRoutesActions::class . ':save');
+    $this->delete('/{employee_id}[/]', \EmployeeRoutesActions::class . ':delete')->add(\MWAuthorizer::class . ':userVerification');
 
-    // $this->delete('/{employee_id}', function (Request $request, Response $response){
-    //     $preJSON = array(   'deleted' => false,
-    //                         'employee' => NULL );
-    //     $employee_id = $request->getAttribute('employee_id');
-    //     $employee = Employee::getFromId($employee_id);
-    //     $deleted = 0;
-    //     if(isset($employee)){
-    //         $deleted = Employee::deleteFromId($employee->getId());
-    //     }
-    //     if($deleted){
-    //         $preJSON['deleted'] = true;
-    //         $preJSON['employee'] = $employee;
-    //     }
-    //     $json = json_encode(  $preJSON,
-    //                             JSON_FORCE_OBJECT);
-    //     return $json;
-    // });
-    $this->delete('/{employee_id}[/]', \EmployeeRoutesActions::class . ':delete');
-
-    /*  logueo de un empleado. */
-    // $this->post('/verify', function (Request $request, Response $response){
-    //     $preJSON = array(   'loged_in' => false,
-    //                         'employee' => NULL );
-    //     $params = $request->getParsedBody();
-    //     $employee = new Employee();
-    //     $employee->setEmail($params['email']);
-    //     $employee->setPassword($params['password']);
-    //     $loged_id = $employee->verify($params['email'], $params['password']);
-    //     if($loged_id){
-    //         $employee = Employee::getFromEmail($employee->getEmail());
-    //         $employee->setPassword('');
-    //         $preJSON['loged_in'] = true;
-    //         $preJSON['employee'] = $employee;
-    //     }
-    //     $json = json_encode(  $preJSON);
-    //     return $json;
-    // });
-
-    // $this->post('/verify', function (Request $request, Response $response){
-    //     $preJSON = array(   'loged_in' => false,
-    //                         'employee' => NULL );
-    //     $params = $request->getParsedBody();
-    //     $employee = new Employee();
-    //     $employee->setEmail($params['email']);
-    //     $employee->setPassword($params['password']);
-    //     $loged_id = $employee->verify($params['email'], $params['password']);
-    //     if($loged_id){
-    //         $employee = Employee::getFromEmail($employee->getEmail());
-    //         $employee->setPassword('');
-    //         $empJson = json_encode($employee);
-    //         $token = JWToken::create($employee);
-    //
-    //         $preJSON['loged_in'] = true;
-    //         $preJSON['jwt'] = $token;
-    //         $preJSON['employee'] = $employee;
-    //     }
-    //     $json = json_encode(  $preJSON);
-    //     return $json;
-    // });
     $this->post('/verify[/]', \EmployeeRoutesActions::class . ':verify');
-
 });
 
 /*** PRUEBA ********///////////
@@ -233,7 +113,7 @@ $app->get('/ejecutarCodigoConVerificacion', function (Request $request, Response
     /*  tomar un valor pasado por el MW. */
     $employee = $request->getAttribute('employee');
     /*  el MW me paso los datos del empleado que mando la solicitud con su jwt. */
-    vd($employee);
+    // vd($employee);
     // vd($bodyParams);
     return $response;
 })->add(\MWAuthorizer::class . ':userVerification');
@@ -242,103 +122,22 @@ $app->get('/ejecutarCodigoConVerificacion', function (Request $request, Response
 /*  Funciones de manejo de la clase Location  */
 /**********************************************/
 $app->group('/location', function () {
-    // $this->get('', function (Request $request, Response $response){
-    //     $locations = null;
-    //     $locations = Location::getAll();
-    //     $json = json_encode( array(  'locations' => $locations) );
-    //     return $json;
-    // });
     $this->get('[/]', \LocationRoutesActions::class . ':getAll');
 
-    // $this->get('/{location_id}', function (Request $request, Response $response){
-    //     $location_id = $request->getAttribute('location_id');
-    //     $location = Location::getFromId($location_id);
-    //     $json = json_encode( array(  'location' => $location));
-    //     return $json;
-    // });
     $this->get('/{location_id}[/]', \LocationRoutesActions::class . ':getFromId');
 
-    // $this->put('', function (Request $request, Response $response){
-    //     $preJSON = array(   'updated' => false,
-    //                         'location' => NULL );
-    //     $params = $request->getParsedBody();
-    //     $location = Location::getFromId($params['id']);
-    //     $location->setFloor($params['floor']);
-    //     $location->setSector($params['sector']);
-    //     $location->setNumber($params['number']);
-    //     $location->setReserved($params['reserved']);
-    //     $updated_id=Location::updateFromId($location);
-    //     if($updated_id){
-    //         $preJSON['updated'] = true;
-    //         $preJSON['location'] = $location;
-    //     }
-    //     $json = json_encode($preJSON);
-    //     return $json;
-    // });
     $this->put('[/]', \LocationRoutesActions::class . ':updateFromId');
 
-    // $this->post('', function (Request $request, Response $response){
-    //     $preJSON = array(   'saved' => false,
-    //                         'location' => NULL );
-    //     $params = $request->getParsedBody();
-    //     $location = new Location();
-    //     $location->setFloor($params['floor']);
-    //     $location->setSector($params['sector']);
-    //     $location->setNumber($params['number']);
-    //     $location->setReserved($params['reserved']);
-    //     $saved_id = $location->save();
-    //     if($saved_id){
-    //         $location->setId($saved_id);
-    //         $preJSON['saved'] = true;
-    //         $preJSON['location'] = $location;
-    //     }
-    //     $json = json_encode($preJSON);
-    //     return $json;
-    // });
     $this->post('[/]', \LocationRoutesActions::class . ':save');
 
-    // $this->delete('/{location_id}', function (Request $request, Response $response){
-    //     $preJSON = array(   'deleted' => false,
-    //                         'location' => NULL );
-    //     $location_id = $request->getAttribute('location_id');
-    //     $location = Location::getFromId($location_id);
-    //     $deleted = 0;
-    //     if(isset($location)){
-    //         $deleted = Location::deleteFromId($location->getId());
-    //     }
-    //     if($deleted){
-    //         $preJSON['deleted'] = true;
-    //         $preJSON['location'] = $location;
-    //     }
-    //     $json = json_encode($preJSON);
-    //     return $json;
-    // });
     $this->delete('/{location_id}[/]', \LocationRoutesActions::class . ':delete');
-
-});
+})->add(\MWAuthorizer::class . ':userVerification');
 /******************************************/
 /*  Funciones de manejo de la clase Price */
 /******************************************/
 $app->group('/price', function () {
-    // $this->post('', function (Request $request, Response $response){
-    //     $preJSON = array(   'saved' => false,
-    //                         'price' => NULL );
-    //     $params = $request->getParsedBody();
-    //     $price = new Price();
-    //     $price->setHour($params['hour']);
-    //     $price->setHalf_day($params['half_day']);
-    //     $price->setDay($params['day']);
-    //     $saved_id = $price->save();
-    //     if($saved_id){
-    //         $price->setId($saved_id);
-    //         $preJSON['saved'] = true;
-    //         $preJSON['price'] = $price;
-    //     }
-    //     $json = json_encode($preJSON);
-    //     return $json;
-    // });
     $this->post('[/]', \PriceRoutesActions::class . ':save');
 
-});
+})->add(\MWAuthorizer::class . ':userVerification');
 
 $app->run();

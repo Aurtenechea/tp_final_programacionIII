@@ -53,6 +53,7 @@ class Location implements JsonSerializable{
         return $dba->returnLastInsertId();
     }
     public static function getAll(){
+        
         $dba = DBAccess::getDBAccessObj();
         $query = $dba->getQueryObj("SELECT * FROM LOCATION;");
         $query->execute();
@@ -128,6 +129,25 @@ class Location implements JsonSerializable{
         $location = $query->fetchAll(PDO::FETCH_CLASS, "Location");
         $location = empty($location) ? null : $location[0];
         return $location;
+    }
+    public static function getMostUsed(){
+      $dba = DBAccess::getDBAccessObj();
+      $query = $dba->getQueryObj("SELECT count(*) AS cant, L.*, P.location_id FROM PARKS AS P INNER JOIN LOCATION AS L ON L.id = P.location_id GROUP BY location_id ORDER BY cant DESC LIMIT 1;" );
+      $query->execute();
+      $location = $query->fetchAll(PDO::FETCH_CLASS, "Location");
+      $location = empty($location) ? null : $location[0];
+      return $location;
+    }
+
+    // TODO, seleccionar una location en la que el id no este en la lista de
+    // location_ids usadas en PARKS   OR   la que count sea menor.
+    public static function getLeastUsed(){
+      $dba = DBAccess::getDBAccessObj();
+      $query = $dba->getQueryObj("SELECT count(*) AS cant, L.*, P.location_id FROM PARKS AS P INNER JOIN LOCATION AS L ON L.id = P.location_id GROUP BY location_id ORDER BY cant ASC LIMIT 1;" );
+      $query->execute();
+      $location = $query->fetchAll(PDO::FETCH_CLASS, "Location");
+      $location = empty($location) ? null : $location[0];
+      return $location;
     }
     // </API methods **************************************
 }

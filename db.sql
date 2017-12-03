@@ -8,22 +8,23 @@ CREATE TABLE CAR
   license VARCHAR(10) DEFAULT 'undefined',
   color VARCHAR(20) DEFAULT 'undefined',
   brand VARCHAR(50) DEFAULT 'undefined',
-  owner_id BIGINT NOT NULL,
+  -- owner_id BIGINT NOT NULL, -- no va mas
   comment TINYTEXT,
   disabled BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE TABLE PERSON
-(
-    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    dni VARCHAR(10) NOT NULL DEFAULT 'undefined',
-    first_name VARCHAR(30) DEFAULT 'undefined',
-    last_name VARCHAR(30) DEFAULT 'undefined',
-    email VARCHAR(50) DEFAULT 'undefined',
-    phone VARCHAR(20) DEFAULT 'undefined',
-    gender CHAR(1) DEFAULT '-',
-    unique (dni)
-);
+-- creo que no va mas
+-- CREATE TABLE PERSON
+-- (
+--     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+--     dni VARCHAR(10) NOT NULL DEFAULT 'undefined',
+--     first_name VARCHAR(30) DEFAULT 'undefined',
+--     last_name VARCHAR(30) DEFAULT 'undefined',
+--     email VARCHAR(50) DEFAULT 'undefined',
+--     phone VARCHAR(20) DEFAULT 'undefined',
+--     gender CHAR(1) DEFAULT '-',
+--     unique (dni)
+-- );
 
 -- DROP TABLE LOCATION;
 CREATE TABLE LOCATION

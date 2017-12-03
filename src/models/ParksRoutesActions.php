@@ -1,6 +1,7 @@
 <?php
 class ParksRoutesActions
 {
+
  	public function getAllStillIn($request, $response, $args) {
         /*  preseteo el array de respuesta. */
         $responseArray = [];
@@ -22,6 +23,23 @@ class ParksRoutesActions
             de parks o null. */
         $result = json_encode(array('parks' => $responseArray));
         return $result;
+    }
+
+    public function deleteFromId($request, $response, $args) {
+        $preJSON = array(   'deleted' => false,
+                            'parks' => NULL );
+        $parks_id = $request->getAttribute('parks_id');
+        $parks = Parks::getFromId($parks_id);
+        $deleted = 0;
+        if(isset($parks)){
+            $deleted = Parks::deleteFromId($parks->getId());
+        }
+        if($deleted){
+            $preJSON['deleted'] = true;
+            $preJSON['parks'] = $parks;
+        }
+        $json = json_encode($preJSON);
+        return $json;
     }
 
     public function getAllOuted($request, $response, $args) {
@@ -58,7 +76,9 @@ class ParksRoutesActions
         if(isset($parks)){
             // $parks->setEmp_id_chek_out($_SESSION['id']);
             // para probar con postman. borrar y habilitar la de arriba
-            $parks->setEmp_id_chek_out(30);
+            // $parks->setEmp_id_chek_out(30);
+            $parks->setEmp_id_chek_out(Employee::getCurrentUserId());
+
             $outed = $parks->outCar();
             if($outed){
                 $preJSON['outed'] = true;
@@ -72,13 +92,14 @@ class ParksRoutesActions
         /*  preseteo la respuesta. */
         $preJSON = array(   'outed' => false,
                             'parks' => NULL );
-        $parks_id = $request->getAttribute('parks_id');
+          $parks_id = $request->getAttribute('parks_id');
         /*  traigo el objeto parks a modificar. si no existe devuelve null. */
         $parks = Parks::getFromId($parks_id);
         if(isset($parks)){
             // $parks->setEmp_id_chek_out($_SESSION['id']);
             // para probar con postman. borrar y habilitar la de arriba
-            $parks->setEmp_id_chek_out(30);
+            // $parks->setEmp_id_chek_out(30);
+            $parks->setEmp_id_chek_out(Employee::getCurrentUserId());
             $outed = $parks->outCar();
             if($outed){
                 $preJSON['outed'] = true;
@@ -107,7 +128,7 @@ class ParksRoutesActions
                 $car->setDisabled( json_decode($params['disabled']) ? '1' : '0' );
                 /*  esto no va.. el awner id no sirve mas. */
                 // $car->setOwner_id($_SESSION['id']);
-                $car->setOwner_id(30);
+                // $car->setOwner_id(30);
                 $car->save();
                 $car = Car::getFromLicense($params['license']);
             }
@@ -117,7 +138,9 @@ class ParksRoutesActions
                 $parks->setCar_id($car->getId());
                 $parks->setLocation_id($location->getId());
                 // $parks->setEmp_id_chek_in($_SESSION['id']);
-                $parks->setEmp_id_chek_in('30');
+
+                // $parks->setEmp_id_chek_in('30');
+                $parks->setEmp_id_chek_in(Employee::getCurrentUserId());
                 $parks_insert_id = $parks->save();
                 // si es cero no deberia traer nada...
                 $parks = $parks->getFromId($parks_insert_id);
@@ -131,6 +154,25 @@ class ParksRoutesActions
             }
         }
         $json = json_encode($preJSON);
+        return $json;
+    }
+
+    public function getFromId($request, $response, $args) {
+        $parks_id = $request->getAttribute('parks_id');
+        /*  la funcion devuelve un array o null */
+        // vd($park_id);die;
+        $parks = Parks::getFromId($parks_id);
+        /*  devuelvo un json de un array con la clave 'parks' con un objeto
+            auto o null. */
+
+        $parks->emp_chek_in = Employee::getFromId( $parks->getEmp_id_chek_in() );
+        $parks->car = Car::getFromId($parks->getCar_id());
+        $parks->location = Location::getFromId($parks->getLocation_id());
+        if(!empty($parks->getEmp_id_chek_out())){
+            $parks-> setEmp_id_chek_out( Employee::getFromId( $parks->getEmp_id_chek_out() ));
+        }
+
+        $json = json_encode( array('parks' => $parks) );
         return $json;
     }
 
@@ -159,5 +201,18 @@ class ParksRoutesActions
             de parks o null. */
         $result = json_encode(array('parks' => $responseArray));
         return $result;
+    }
+
+    // TODO, borrar
+    // esto esta aca solo para testear el calculateCost a travez de
+    // get -> parks/test_price/:parks_id
+    public function calculateCost($request, $response, $args) {
+        $parks_id = $request->getAttribute('parks_id');
+        $parks = Parks::getFromId($parks_id);
+        $car = Car::getFromId($parks->getCar_id());
+        $price = Price::getPriceFromDate($parks->getCheck_in());
+        $cost = $car->getDisabled() ? 0 : $parks->calculateCost($price);
+
+        return var_dump($cost);
     }
 }

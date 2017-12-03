@@ -1,8 +1,11 @@
 /// <reference path="routes.ts"/>
 /// <reference path="car.ts"/>
 
-let car :Car = Car.search_car("JJJ-123");
-// console.log(car.park());
+function hacerConElAuto(car :Car){
+    console.log(car.color);
+    // alert(car.color);
+}
 
-console.log(car);
-// console.log(car.toJson());
+Car.search_car("JJJ-123", hacerConElAuto);
+
+// console.log(car);

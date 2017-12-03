@@ -17,7 +17,10 @@
         <!-- <link rel="stylesheet" href="./style.css"> -->
 
         <!-- scripts -->
-        <script src="http://localhost/utn/tp_final_programacionIII/server/php_mvc_framework_propio/app/views/js/login.js"></script>
+        <script src="http://localhost/utn/tp_final_programacionIII/server/php_mvc_framework_propio/app/views/js/typescript/lib.js"></script>
+        <script src="http://localhost/utn/tp_final_programacionIII/server/php_mvc_framework_propio/app/views/js/typescript/ajax.js"></script>
+        <script src="http://localhost/utn/tp_final_programacionIII/server/php_mvc_framework_propio/app/views/js/typescript/login2.js"></script>
+        <!-- <script src="http://localhost/utn/tp_final_programacionIII/server/php_mvc_framework_propio/app/views/js/login.js"></script> -->
 
     </head>
     <body>

@@ -84,7 +84,7 @@ class Parks implements JsonSerializable{
             $query->execute();
 
             $parks = Parks::getFromId($this->id);
-            $cost = $car->getDisabled() ? 0 :$parks->calculateCost($price);
+            $cost = $car->getDisabled() ? 0 : $parks->calculateCost($price);
 
             $query = $dba->getQueryObj("UPDATE PARKS SET    cost = :cost
                                             WHERE id = :id;"
@@ -119,6 +119,10 @@ class Parks implements JsonSerializable{
             $result = $query->fetch(PDO::FETCH_ASSOC);
             $day_dif = $result['day_dif'];
             // float
+            // vd( $priceObj );die;
+            // vd( Parks::getHoursFromMinuts($result['minut_dif']) );die;
+            // vd( Parks::getDaysFromMinuts($result['minut_dif']) );die;
+
             $hour_dif = (((int)$result['minut_dif']) - ($day_dif * 24 * 60)) / 60;
             $half_day_dif = 0;
             if($hour_dif > 12){
@@ -132,9 +136,26 @@ class Parks implements JsonSerializable{
             // vd($day_dif);
             // vd($priceObj);
             // vd($total);die();
+            vd( $total );die;
             return $total;
         }
     }
+    public static function getHoursFromMinuts($minuts){
+      return $minuts / 60;
+    }
+    public static function getDaysFromMinuts($minuts){
+      $hours = $minuts / 60;
+      return $hours / 24;
+    }
+
+    public static function deleteFromId($parks_id){
+      $dba = DBAccess::getDBAccessObj();
+      $query = $dba->getQueryObj("DELETE FROM PARKS WHERE id = :id");
+      $query->bindValue(':id',$parks_id, PDO::PARAM_INT);
+      $query->execute();
+      return $query->rowCount();
+    }
+
     /*  trae de la base de datos el parks con el id pasado como param.
         @return  un objeto auto o null. */
     public static function getFromId($parks_id){
@@ -218,4 +239,41 @@ class Parks implements JsonSerializable{
         return $result;
     }
     // </API methods **************************************
+    // public function calculateCost($priceObj){
+    //     $result = 0;
+    //     if(!empty($this->check_in) && !empty($this->check_out)){
+    //         $dba = DBAccess::getDBAccessObj();
+    //         $query = $dba->getQueryObj("SELECT TIMESTAMPDIFF(   DAY,
+    //                                                             :check_in,
+    //                                                             :check_out) AS day_dif,
+    //                                             TIMESTAMPDIFF(   MINUTE,
+    //                                                             :check_inn,
+    //                                                             :check_outt) AS minut_dif;"
+    //                                     );
+    //         $query->bindValue(':check_in',$this->check_in, PDO::PARAM_STR);
+    //         $query->bindValue(':check_out',$this->check_out, PDO::PARAM_STR);
+    //         $query->bindValue(':check_inn',$this->check_in, PDO::PARAM_STR);
+    //         $query->bindValue(':check_outt',$this->check_out, PDO::PARAM_STR);
+    //         $query->execute();
+    //         $result = $query->fetch(PDO::FETCH_ASSOC);
+    //         // $day_dif = $result['day_dif'];
+    //         // float
+    //         // vd( Parks::getHoursFromMinuts($result['minut_dif']) );die;
+    //         // vd( Parks::getDaysFromMinuts($result['minut_dif']) );die;
+    //         $hour_dif = (((int)$result['minut_dif']) - ($day_dif * 24 * 60)) / 60;
+    //         $half_day_dif = 0;
+    //         if($hour_dif > 12){
+    //             $half_day_dif = 1;
+    //             $hour_dif = $hour_dif - 12;
+    //         }
+    //         $total = 0;
+    //         $total = $priceObj->getDay() * $day_dif;
+    //         $total += $priceObj->getHalf_day() * $half_day_dif;
+    //         $total += $priceObj->getHour() * $hour_dif;
+    //         // vd($day_dif);
+    //         // vd($priceObj);
+    //         // vd($total);die();
+    //         return $total;
+    //     }
+    // }
 }

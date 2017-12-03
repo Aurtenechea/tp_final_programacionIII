@@ -13,9 +13,9 @@ class JWToken
         $now = time();
         $payload = array(
         	'iat'=>$now,
-            'exp' => $now + (60 * 60),  // una hora
+            // 'exp' => $now + (60 * 60 * 1000 ),  // una hora
             'aud' => self::createAud(), // en sha1
-            'data' => $data,
+            'employee' => $data,
             'app'=> "API REST 2017"
         );
         return JWT::encode($payload, self::$secret);
@@ -54,7 +54,7 @@ class JWToken
             $token,
             self::$secret,
             self::$hashingAlgorithm
-        )->data;
+        )->employee;
     }
     /*  esta funcion sirve para setear quien es la audiencia,
         osea quien recibira el token. O lo que es lo mismo, quien hizo el request.

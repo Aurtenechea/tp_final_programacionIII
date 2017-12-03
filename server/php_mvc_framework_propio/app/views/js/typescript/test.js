@@ -1,6 +1,8 @@
 /// <reference path="routes.ts"/>
 /// <reference path="car.ts"/>
-var car = Car.search_car("JJJ-123");
-// console.log(car.park());
-console.log(car);
-// console.log(car.toJson());
+function hacerConElAuto(car) {
+    console.log(car.color);
+    // alert(car.color);
+}
+Car.search_car("JJJ-123", hacerConElAuto);
+// console.log(car);

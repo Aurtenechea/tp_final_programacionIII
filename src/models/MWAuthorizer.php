@@ -6,32 +6,44 @@ class MWAuthorizer{
 		// $response->getBody()->write('Ejecucion del MW. Pre funcion.');
 		// $response = $next($request, $response);
 		// $response->getBody()->write('Ejecucion del MW.');
+
+		$validation = false;
+		$uri = $request->getUri();
+		$requestPath = $uri->getPath();
+
 		$headers = getallheaders();
 		if(!isset($headers['Authorization'])){
 			$headers['Authorization'] = '';
 		}
+
 	    $token = $headers['Authorization'];
 	    $token = explode(" ", $token);
-		$token = array_reverse($token);
+			$token = array_reverse($token);
 	    $token = $token[0];
 		// $token = str_replace('"', '', $token);
-	    $validation = false;
 		// echo("El token es: " . $token);
 		/*	JWToken::verify lanza un error si el token es invalido. */
 	    try{
 			JWToken::verify($token);
 			$validation = true;
+
 			$data = JWToken::getData($token);
+			// return var_dump($data);
 			$request = $request->withAttribute('employee', $data);
+
+			$newToken = JWToken::create($data);
+			$response = $response->withHeader('NewAutorization', $newToken);
 	    }
 	    catch (Exception $e) {
 			// echo($e);
 			echo "Verification error.";
 	    }
 		/*	Si */
-	    if($validation){
+	    if($validation ){
 	        // echo "Valid Token.";
 			$response = $next($request, $response);
+			// $body = $response->getBody();
+			// vd($body);
 	    }
 	    else{
 			echo "Invalid Token.";

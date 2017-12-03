@@ -3,7 +3,6 @@
 /// <reference path="lib.ts"/>
 
 // declare var $ :any;
-
 class Car{
     public id;
     public license;
@@ -26,55 +25,14 @@ class Car{
     }
 
     /*  consulta la api y devuelve el auto con esa licencia si existe. */
-    public static search_car(license :string){
-        var result :any;
-        //
-        // // CON JQUERY
-        //
-        // var params = { "license": license };
-        // /*  seteo la url. */
-        // var url = root_url_api + "/car/" + license;
-        // /*  crea el objeto ajax */
-        // var parkCarAjax = $.ajax(
-        //     {
-        //         type: 'GET',
-        //         url: url,
-        //         data: params,
-        //     }
-        // );
-        // var callbackSucces = function( data ){
-        //     let id, license, brand, color, owner_id, comment, disabled;
-        //
-        //     let dataJson = JSON.parse(data);
-        //
-        //     if(typeof(dataJson.car) != "undefined" && dataJson.car !== null){
-        //         console.log(dataJson.car);
-        //         id = dataJson.car.id;
-        //         license = dataJson.car.license;
-        //         brand = dataJson.car.brand;
-        //         color = dataJson.car.color;
-        //         owner_id = dataJson.car.owner_id;
-        //         comment = dataJson.car.comment;
-        //         disabled = dataJson.car.disabled;
-        //     }
-        //     let car :Car = new Car(id, license, brand, color, owner_id, comment ,disabled);
-        //     result = car;
-        // };
-        // /*  CALLBACK ERROR de crear un auto */
-        // function callbackError(error){
-        //     console.log("search_car Error: " + error);
-        //     result = null;
-        // }
-        // /*  ejecuta el ajax */
-        // parkCarAjax.then(callbackSucces, callbackError); // params: donecallbak, fail callback
-        // //FIN CON JQUERY
-
-        // // CON Ajax.ts
+    public static search_car(license :string, callback :Function){
         let ax :Ajax = new Ajax();
-        let url = root_url_api + "/car/" + license;
+        let url  = root_url_api + "/car/" + license;
         let exito = function( data ){
+            console.log(data);
             let id, license, brand, color, owner_id, comment, disabled;
             let dataJson = JSON.parse(data);
+            let car :Car;
             if(typeof(dataJson.car) != "undefined" && dataJson.car !== null){
                 // console.log(dataJson.car);
                 id = dataJson.car.id;
@@ -85,14 +43,12 @@ class Car{
                 comment = dataJson.car.comment;
                 disabled = dataJson.car.disabled;
             }
-            let car :Car = new Car(id, license, brand, color, owner_id, comment ,disabled);
-
-            // console.log("ENTRO a EXITO" + car)
-            result = car;
+            car = new Car(id, license, brand, color, owner_id, comment ,disabled);
+            callback(car);
         };
         ax.get(url ,exito);
-        // // FIN CON Ajax.ts
-        return result;
+        ax.xhr.setRequestHeader("Authorization", "Bearer " + localStorage.getItem('jwt'));
+        ax.send();
     }
 
 
