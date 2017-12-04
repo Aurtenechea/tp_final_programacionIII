@@ -24,12 +24,11 @@ class MWAuthorizer{
 		// $token = str_replace('"', '', $token);
 		// echo("El token es: " . $token);
 		/*	JWToken::verify lanza un error si el token es invalido. */
-		echo($token);
-		var_dump($token);die;
     try{
 			JWToken::verify($token);
 			$validation = true;
 			$data = JWToken::getData($token);
+			var_dump($data);die;
 
 			if($data->state == 'suspend'){
 				throw new Exception("employee suspended");
