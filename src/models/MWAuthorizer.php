@@ -6,9 +6,9 @@ class MWAuthorizer{
 		// $response->getBody()->write('Ejecucion del MW. Pre funcion.');
 		// $response = $next($request, $response);
 		// $response->getBody()->write('Ejecucion del MW.');
-		echo(phpversion());
-		phpinfo();
-		die;
+		// echo(phpversion());
+		// phpinfo();
+		// die;
 
 		$validation = false;
 		$uri = $request->getUri();
