@@ -28,7 +28,7 @@ class MWAuthorizer{
 			JWToken::verify($token);
 			$validation = true;
 			$data = JWToken::getData($token);
-			var_dump($data);die;
+			// var_dump($data);die;
 
 			if($data->state == 'suspend'){
 				throw new Exception("employee suspended");

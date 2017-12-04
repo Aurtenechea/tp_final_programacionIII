@@ -50,6 +50,8 @@ class JWToken
         );
     }
     public static function getData($token){
+      echo($token);
+        var_dump( JWT::decode( $token, self::$secret, self::$hashingAlgorithm )->employee );die;
         return JWT::decode(
             $token,
             self::$secret,
