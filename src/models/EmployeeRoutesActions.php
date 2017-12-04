@@ -22,6 +22,41 @@ class EmployeeRoutesActions
         return $response;
     }
 
+    public function cantOperationsFromDate($request, $response, $args) {
+        $date = $request->getAttribute('date');
+        $emp_id = $request->getAttribute('employee_id');
+
+        $result = Employee::getCantOperationsCheckInFromDate($date, $emp_id);
+        $result += Employee::getCantOperationsCheckOutFromDate($date, $emp_id);
+        $json = json_encode(array('cant_operations' => $result));
+        return $json;
+    }
+    public function cantOperationsFromRange($request, $response, $args) {
+        $date_from = $request->getAttribute('date_from');
+        $date_to = $request->getAttribute('date_to');
+        $emp_id = $request->getAttribute('employee_id');
+
+        $result = Employee::getCantOperationsCheckInFromRange($date_from, $date_to, $emp_id);
+        $result += Employee::getCantOperationsCheckOutFromRange($date_from, $date_to, $emp_id);
+        $json = json_encode(array('cant_operations' => $result));
+        return $json;
+    }
+
+
+
+    public function logsFromDate($request, $response, $args) {
+        $date = $request->getAttribute('date');
+        $result = Employee::getLogsFromDate($date);
+        $json = json_encode(array('employees_logs' => $result));
+        return $json;
+    }
+    public function logsFromRange($request, $response, $args) {
+        $date_from = $request->getAttribute('date_from');
+        $date_to = $request->getAttribute('date_to');
+        $result = Employee::getLogsFromRange($date_from, $date_to);
+        $json = json_encode(array('employees_logs' => $result));
+        return $json;
+    }
     public function getFromId($request, $response, $args) {
         $employee_id = $request->getAttribute('employee_id');
         $employee = Employee::getFromId($employee_id);

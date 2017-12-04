@@ -1,6 +1,53 @@
 <?php
 class ParksRoutesActions
 {
+  public function getOutedFromDate($request, $response, $args) {
+      $date = $request->getAttribute('date');
+      $result = Parks::getOutedFromDate($date);
+      if( !empty($result) ){
+          /*  Recorre los parks y va creando cada objeto con los valores necesarios,
+              reemplazando location id y car id por el objeto correspondiente. */
+          foreach ($result as $item) {
+              $item->setEmp_id_chek_in( Employee::getFromId( $item->getEmp_id_chek_in() ));
+              $item->setEmp_id_chek_out( Employee::getFromId( $item->getEmp_id_chek_out() ));
+              $item->car = Car::getFromId($item->getCar_id());
+              $item->location = Location::getFromId($item->getLocation_id());
+              $responseArray[] = $item;
+          }
+      }
+      $responseArray = empty($responseArray) ? null : $responseArray;
+      /*  devuelvo un json de un array con la clave 'parks' con un array
+          de parks o null. */
+      $json = json_encode(array('parks' => $responseArray));
+      return $json;
+  }
+  public function getOutedFromRange($request, $response, $args) {
+      $date_from = $request->getAttribute('date_from');
+      $date_to = $request->getAttribute('date_to');
+
+      $result = Parks::getOutedFromRange($date_from, $date_to);
+
+
+      if( !empty($result) ){
+          /*  Recorre los parks y va creando cada objeto con los valores necesarios,
+              reemplazando location id y car id por el objeto correspondiente. */
+          foreach ($result as $item) {
+              $item->setEmp_id_chek_in( Employee::getFromId( $item->getEmp_id_chek_in() ));
+              $item->setEmp_id_chek_out( Employee::getFromId( $item->getEmp_id_chek_out() ));
+              $item->car = Car::getFromId($item->getCar_id());
+              $item->location = Location::getFromId($item->getLocation_id());
+              $responseArray[] = $item;
+          }
+      }
+      $responseArray = empty($responseArray) ? null : $responseArray;
+      /*  devuelvo un json de un array con la clave 'parks' con un array
+          de parks o null. */
+      $json = json_encode(array('parks' => $responseArray));
+      return $json;
+  }
+
+
+
 
  	public function getAllStillIn($request, $response, $args) {
         /*  preseteo el array de respuesta. */
@@ -12,7 +59,8 @@ class ParksRoutesActions
             /*  Recorre los parks y va creando cada objeto con los valores necesarios,
                 reemplazando location id y car id por el objeto correspondiente. */
             foreach ($result as $item) {
-                $item->emp_chek_in = Employee::getFromId( $item->getEmp_id_chek_in() );
+                $item->setEmp_id_chek_in( Employee::getFromId( $item->getEmp_id_chek_in() ));
+                // $item->emp_chek_in = Employee::getFromId( $item->getEmp_id_chek_in() );
                 $item->car = Car::getFromId($item->getCar_id());
                 $item->location = Location::getFromId($item->getLocation_id());
                 $responseArray[] = $item;
@@ -52,7 +100,9 @@ class ParksRoutesActions
             /*  Recorre los parks y va creando cada objeto con los valores necesarios,
                 reemplazando location id y car id por el objeto correspondiente. */
             foreach ($result as $item) {
-                $item->emp_chek_in = Employee::getFromId( $item->getEmp_id_chek_in() );
+                $item->setEmp_id_chek_in( Employee::getFromId( $item->getEmp_id_chek_in() ) );
+                $item->setEmp_id_chek_out( Employee::getFromId( $item->getEmp_id_chek_out() ) );
+                // $item->emp_chek_in = Employee::getFromId( $item->getEmp_id_chek_in() );
                 $item->car = Car::getFromId($item->getCar_id());
                 $item->location = Location::getFromId($item->getLocation_id());
                 $responseArray[] = $item;
@@ -187,7 +237,7 @@ class ParksRoutesActions
             /*  Recorre los parks y va creando cada objeto con los valores necesarios,
                 reemplazando location id y car id por el objeto correspondiente. */
             foreach ($result as $item) {
-                $item->emp_chek_in = Employee::getFromId( $item->getEmp_id_chek_in() );
+                $item->setEmp_id_chek_in( Employee::getFromId( $item->getEmp_id_chek_in() ) );
                 $item->car = Car::getFromId($item->getCar_id());
                 $item->location = Location::getFromId($item->getLocation_id());
                 if(!empty($item->getEmp_id_chek_out())){

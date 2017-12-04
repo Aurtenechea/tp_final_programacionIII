@@ -41,6 +41,50 @@ class Parks implements JsonSerializable{
     }
 
     // <API methods **************************************
+
+    public static function getOutedFromDate($date){
+      $dba = DBAccess::getDBAccessObj();
+      $query_text = " SELECT * FROM PARKS WHERE NOT ISNULL(check_out) " .
+                    " AND CAST(check_in AS DATE) " .
+                    " BETWEEN CAST('" .
+                    $date . " 00:00:00' AS DATE) AND CAST('" .
+                    $date . " 23:59:59' AS DATE) " .
+                    " AND CAST(check_out AS DATE) " .
+                    " BETWEEN CAST('" .
+                    $date . " 00:00:00' AS DATE) AND CAST('" .
+                    $date . " 23:59:59' AS DATE) " .
+                    " ORDER BY check_out DESC;";
+
+      $query = $dba->getQueryObj($query_text);
+      $query->execute();
+      $result = $query->fetchAll(PDO::FETCH_CLASS, "Parks");
+      // $responseArray = array();
+      /*  si es un array vacio asiganarle null sino dejar el array */
+      $result = empty($result) ? null : $result;
+      return $result;
+    }
+    public static function getOutedFromRange($date_from, $date_to){
+      $dba = DBAccess::getDBAccessObj();
+      $query_text = " SELECT * FROM PARKS WHERE NOT ISNULL(check_out) " .
+                    " AND CAST(check_in AS DATE) " .
+                    " BETWEEN CAST('" .
+                    $date_from . " 00:00:00' AS DATE) AND CAST('" .
+                    $date_to . " 23:59:59' AS DATE) " .
+                    " AND CAST(check_out AS DATE) " .
+                    " BETWEEN CAST('" .
+                    $date_from . " 00:00:00' AS DATE) AND CAST('" .
+                    $date_to . " 23:59:59' AS DATE) " .
+                    " ORDER BY check_out DESC;";
+
+      $query = $dba->getQueryObj($query_text);
+      $query->execute();
+      $result = $query->fetchAll(PDO::FETCH_CLASS, "Parks");
+      // $responseArray = array();
+      /*  si es un array vacio asiganarle null sino dejar el array */
+      $result = empty($result) ? null : $result;
+      return $result;
+    }
+
     /*  guarda un parks para eso necesita el id del auto, de la ubicacion y el
         id del empleado actual. Devuelve 0 si no guado y
         el id del parks si se guardo. */

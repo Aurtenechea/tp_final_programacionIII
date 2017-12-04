@@ -70,19 +70,124 @@ class LocationRoutesActions
 
 
     public function getMostUsed($request, $response, $args) {
-        $preJSON = array( 'location' => NULL );
-        $location = Location::getMostUsed();
-        if(isset($location)){
-            $deleted = Location::deleteFromId($location->getId());
-        }
-        if($deleted){
-            $preJSON['deleted'] = true;
-            $preJSON['location'] = $location;
-        }
-        $json = json_encode($preJSON);
-        return $json;
+      $preJSON = array( 'Parks' => NULL );
+      $parks = Location::getMostUsed();
+      $parks->setEmp_id_chek_in( Employee::getFromId( $parks->getEmp_id_chek_in() ));
+      $parks->setEmp_id_chek_out( Employee::getFromId( $parks->getEmp_id_chek_out() ));
+      $parks->car = Car::getFromId($parks->getCar_id());
+      $parks->location = Location::getFromId($parks->getLocation_id());
+      if(isset($parks)){
+        $preJSON['Parks'] = $parks;
+      }
+      $json = json_encode($preJSON);
+      return $json;
     }
 
+    public function getMostUsedFromDate($request, $response, $args) {
+      $date = $request->getAttribute('date');
+      $preJSON = array( 'Parks' => NULL );
+      $parks = Location::getMostUsedFromDate($date);
+      $parks->setEmp_id_chek_in( Employee::getFromId( $parks->getEmp_id_chek_in() ));
+      $parks->setEmp_id_chek_out( Employee::getFromId( $parks->getEmp_id_chek_out() ));
+      $parks->car = Car::getFromId($parks->getCar_id());
+      $parks->location = Location::getFromId($parks->getLocation_id());
+      if(isset($parks)){
+        $preJSON['Parks'] = $parks;
+      }
+      $json = json_encode($preJSON);
+      return $json;
+    }
+    public function getMostUsedFromRange($request, $response, $args) {
+      $date_from = $request->getAttribute('date_from');
+      $date_to = $request->getAttribute('date_to');
+      $preJSON = array( 'Parks' => NULL );
+      $parks = Location::getMostUsedFromRange($date_from, $date_to);
+      $parks->setEmp_id_chek_in( Employee::getFromId( $parks->getEmp_id_chek_in() ));
+      $parks->setEmp_id_chek_out( Employee::getFromId( $parks->getEmp_id_chek_out() ));
+      $parks->car = Car::getFromId($parks->getCar_id());
+      $parks->location = Location::getFromId($parks->getLocation_id());
+      if(isset($parks)){
+        $preJSON['Parks'] = $parks;
+      }
+      $json = json_encode($preJSON);
+      return $json;
+    }
+    public function getLeastUsed($request, $response, $args) {
+      $preJSON = array( 'Parks' => NULL );
+      $parks = Location::getLeastUsed();
+      // vd($parks);die;
+      $parks->setEmp_id_chek_in( Employee::getFromId( $parks->getEmp_id_chek_in() ));
+      $parks->setEmp_id_chek_out( Employee::getFromId( $parks->getEmp_id_chek_out() ));
+      $parks->car = Car::getFromId($parks->getCar_id());
+      $parks->location = Location::getFromId($parks->getLocation_id());
+      if(isset($parks)){
+        $preJSON['Parks'] = $parks;
+      }
+      $json = json_encode($preJSON);
+      return $json;
+    }
+    public function getLeastUsedFromDate($request, $response, $args) {
+      $date = $request->getAttribute('date');
+      $preJSON = array( 'Parks' => NULL );
+      $parks = Location::getLeastUsedFromDate($date);
+      $parks->setEmp_id_chek_in( Employee::getFromId( $parks->getEmp_id_chek_in() ));
+      $parks->setEmp_id_chek_out( Employee::getFromId( $parks->getEmp_id_chek_out() ));
+      $parks->car = Car::getFromId($parks->getCar_id());
+      $parks->location = Location::getFromId($parks->getLocation_id());
+      if(isset($parks)){
+        $preJSON['Parks'] = $parks;
+      }
+      $json = json_encode($preJSON);
+      return $json;
+    }
+
+    public function getUnusedFromDate($request, $response, $args) {
+      $date = $request->getAttribute('date');
+
+      $preJSON = array( 'location' => NULL );
+      $location = Location::getUnusedFromDate($date);
+      if(isset($location)){
+        $preJSON['location'] = $location;
+      }
+      $json = json_encode($preJSON);
+      return $json;
+    }
+    public function getUnusedFromRange($request, $response, $args) {
+      $date_from = $request->getAttribute('date_from');
+      $date_to = $request->getAttribute('date_to');
+
+      $preJSON = array( 'location' => NULL );
+      $location = Location::getUnusedFromRange($date_from, $date_to);
+      if(isset($location)){
+        $preJSON['location'] = $location;
+      }
+      $json = json_encode($preJSON);
+      return $json;
+    }
+    public function getLeastUsedFromRange($request, $response, $args) {
+      $date_from = $request->getAttribute('date_from');
+      $date_to = $request->getAttribute('date_to');
+      $preJSON = array( 'Parks' => NULL );
+      $parks = Location::getLeastUsedFromRange($date_from, $date_to);
+      $parks->setEmp_id_chek_in( Employee::getFromId( $parks->getEmp_id_chek_in() ));
+      $parks->setEmp_id_chek_out( Employee::getFromId( $parks->getEmp_id_chek_out() ));
+      $parks->car = Car::getFromId($parks->getCar_id());
+      $parks->location = Location::getFromId($parks->getLocation_id());
+      if(isset($parks)){
+        $preJSON['Parks'] = $parks;
+      }
+      $json = json_encode($preJSON);
+      return $json;
+    }
+    public function getUnused($request, $response, $args) {
+      $preJSON = array( 'location' => NULL );
+      $location = Location::getUnused();
+      if(isset($location)){
+        $preJSON['location'] = $location;
+      }
+      $json = json_encode($preJSON);
+      return $json;
+    }
     // public static function getFromId($employee_id){
     //   $dba = DBAccess::getDBAccessObj();
     //   $query = $dba->getQueryObj("SELECT * FROM EMPLOYEE WHERE id = :id");

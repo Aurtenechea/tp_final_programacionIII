@@ -78,6 +78,121 @@ class Employee implements JsonSerializable{
       $result = empty($result) ? null : $result;
       return $result;
     }
+
+    public static function getCantOperationsCheckInFromDate($date, $emp_id){
+      $dba = DBAccess::getDBAccessObj();
+      $query_text = "SELECT COUNT(*) AS cant FROM PARKS AS P " .
+                      " WHERE CAST(check_in AS DATE) BETWEEN CAST('" .
+                      $date . " 00:00:00' AS DATE) AND  CAST('" .
+                      $date . " 23:59:59' AS DATE)  AND ".
+                      "emp_id_chek_in = " . $emp_id . ";";
+
+      // vd($query_text);die;
+      $query = $dba->getQueryObj($query_text);
+
+      $query->execute();
+      $result = $query->fetchAll(PDO::FETCH_ASSOC);
+      $result = $result[0];
+      // vd($result);die;
+
+      $result = empty($result['cant']) ? 0 : $result['cant'];
+      return $result;
+    }
+    public static function getCantOperationsCheckOutFromDate($date, $emp_id){
+      $dba = DBAccess::getDBAccessObj();
+      $query_text = "SELECT COUNT(*) AS cant FROM PARKS AS P " .
+                      " WHERE CAST(check_out AS DATE) BETWEEN CAST('" .
+                      $date . " 00:00:00' AS DATE) AND  CAST('" .
+                      $date . " 23:59:59' AS DATE)  AND ".
+                      "emp_id_chek_out = " . $emp_id . ";";
+
+      // vd($query_text);die;
+      $query = $dba->getQueryObj($query_text);
+
+      $query->execute();
+      $result = $query->fetchAll(PDO::FETCH_ASSOC);
+      $result = $result[0];
+      // vd($result);die;
+
+      $result = empty($result['cant']) ? 0 : $result['cant'];
+      return $result;
+    }
+
+
+
+
+    public static function getCantOperationsCheckInFromRange($date_from, $date_to, $emp_id){
+      $dba = DBAccess::getDBAccessObj();
+      $query_text = "SELECT COUNT(*) AS cant FROM PARKS AS P " .
+                      " WHERE CAST(check_in AS DATE) BETWEEN CAST('" .
+                      $date_from . " 00:00:00' AS DATE) AND  CAST('" .
+                      $date_to . " 23:59:59' AS DATE)  AND ".
+                      "emp_id_chek_in = " . $emp_id . ";";
+
+      // vd($query_text);die;
+      $query = $dba->getQueryObj($query_text);
+
+      $query->execute();
+      $result = $query->fetchAll(PDO::FETCH_ASSOC);
+      $result = $result[0];
+      // vd($result);die;
+
+      $result = empty($result['cant']) ? 0 : $result['cant'];
+      return $result;
+    }
+    public static function getCantOperationsCheckOutFromRange($date_from, $date_to, $emp_id){
+      $dba = DBAccess::getDBAccessObj();
+      $query_text = "SELECT COUNT(*) AS cant FROM PARKS AS P " .
+                      " WHERE CAST(check_out AS DATE) BETWEEN CAST('" .
+                      $date_from . " 00:00:00' AS DATE) AND  CAST('" .
+                      $date_to . " 23:59:59' AS DATE)  AND ".
+                      "emp_id_chek_out = " . $emp_id . ";";
+
+      // vd($query_text);die;
+      $query = $dba->getQueryObj($query_text);
+
+      $query->execute();
+      $result = $query->fetchAll(PDO::FETCH_ASSOC);
+      $result = $result[0];
+      // vd($result);die;
+
+      $result = empty($result['cant']) ? 0 : $result['cant'];
+      return $result;
+    }
+
+
+    public static function getLogsFromDate($date){
+      $dba = DBAccess::getDBAccessObj();
+      $query_text = "SELECT * FROM EMP_LOG AS L " .
+                      " JOIN EMPLOYEE AS E ON L.emp_id = E.id " .
+                      " WHERE CAST(log_in AS DATE) BETWEEN CAST('" .
+                      $date . " 00:00:00' AS DATE) AND  CAST('" .
+                      $date . " 23:59:59' AS DATE);";
+
+      // vd($query_text);die;
+      $query = $dba->getQueryObj($query_text);
+
+      $query->execute();
+      $result = $query->fetchAll(PDO::FETCH_CLASS, "Employee");
+      $result = empty($result) ? null : $result;
+      return $result;
+    }
+    public static function getLogsFromRange($date_from, $date_to){
+      $dba = DBAccess::getDBAccessObj();
+      $query_text = "SELECT * FROM EMP_LOG AS L " .
+                      " JOIN EMPLOYEE AS E ON L.emp_id = E.id " .
+                      " WHERE CAST(log_in AS DATE) BETWEEN CAST('" .
+                      $date_from . " 00:00:00' AS DATE) AND  CAST('" .
+                      $date_to . " 23:59:59' AS DATE);";
+
+      // vd($query_text);die;
+      $query = $dba->getQueryObj($query_text);
+
+      $query->execute();
+      $result = $query->fetchAll(PDO::FETCH_CLASS, "Employee");
+      $result = empty($result) ? null : $result;
+      return $result;
+    }
     public static function getFromId($employee_id){
       $dba = DBAccess::getDBAccessObj();
       $query = $dba->getQueryObj("SELECT * FROM EMPLOYEE WHERE id = :id");

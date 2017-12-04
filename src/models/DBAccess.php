@@ -7,14 +7,16 @@
 
         /*  El constructor es privado, solo se puede llamar desde dentro de
             la clase. Este creara un objeto PDO para poder conectarse a la DB.*/
+        // en el server: user: PARKING_SYSTEM pass: PARKING_SYSTEM db: PARKING_SYSTEM
         private function __construct(){
             try {
-                $this->PDO = new PDO('mysql:host=localhost;dbname=PARKING_SYSTEM;charset=utf8', 'root', 'qweasdzxc', array(PDO::ATTR_EMULATE_PREPARES => false,PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
-                $this->PDO->exec("SET CHARACTER SET utf8");
+              // $this->PDO = new PDO('mysql:host=localhost;dbname=PARKING_SYSTEM;charset=utf8', 'root', 'qweasdzxc', array(PDO::ATTR_EMULATE_PREPARES => false,PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+              $this->PDO = new PDO('mysql:host=localhost;dbname=PARKING_SYSTEM;charset=utf8', 'PARKING_SYSTEM', 'PARKING_SYSTEM', array(PDO::ATTR_EMULATE_PREPARES => false,PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+              $this->PDO->exec("SET CHARACTER SET utf8");
             }
             catch (PDOException $e){
-                print "Error!: " . $e->getMessage();
-                die();
+              print "Error!: " . $e->getMessage();
+              die();
             }
         }
 

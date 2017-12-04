@@ -11,45 +11,54 @@ class MWAuthorizer{
 		$uri = $request->getUri();
 		$requestPath = $uri->getPath();
 
+
 		$headers = getallheaders();
 		if(!isset($headers['Authorization'])){
 			$headers['Authorization'] = '';
 		}
 
-	    $token = $headers['Authorization'];
-	    $token = explode(" ", $token);
-			$token = array_reverse($token);
-	    $token = $token[0];
+    $token = $headers['Authorization'];
+    $token = explode(" ", $token);
+		$token = array_reverse($token);
+    $token = $token[0];
 		// $token = str_replace('"', '', $token);
 		// echo("El token es: " . $token);
 		/*	JWToken::verify lanza un error si el token es invalido. */
-	    try{
+    try{
 			JWToken::verify($token);
 			$validation = true;
-
 			$data = JWToken::getData($token);
-			// return var_dump($data);
-			$request = $request->withAttribute('employee', $data);
 
+			// /employee/... paths only for admin users.
+			if($data->state == 'suspend'){
+				throw new Exception("employee suspended");
+			}
+
+			// /employee/... paths only for admin users.
+			if(strpos($requestPath, 'employee') !== false && $data->rol != 'admin'){
+				throw new Exception("Employee in path only for admins users");
+			}
+
+			$request = $request->withAttribute('employee', $data);
 			$newToken = JWToken::create($data);
 			$response = $response->withHeader('NewAutorization', $newToken);
-	    }
-	    catch (Exception $e) {
+    }
+    catch (Exception $e) {
 			// echo($e);
 			echo "Verification error.";
-	    }
+    }
 		/*	Si */
-	    if($validation ){
-	        // echo "Valid Token.";
+    if($validation){
+        // echo "Valid Token.";
 			$response = $next($request, $response);
-			// $body = $response->getBody();
-			// vd($body);
-	    }
-	    else{
+		// $body = $response->getBody();
+		// vd($body);
+    }
+    else{
 			echo "Invalid Token.";
-	    }
-		// $response->getBody()->write('Ejecucion del MW. Post funcion.');
-		return $response;
+    }
+	// $response->getBody()->write('Ejecucion del MW. Post funcion.');
+	return $response;
 
 		// if($request->isGet()){
 		// // $response->getBody()->write('<p>NO necesita credenciales para los get </p>');

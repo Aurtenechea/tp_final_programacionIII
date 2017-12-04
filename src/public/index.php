@@ -56,6 +56,11 @@ $app->group('/parks', function(){
     /*  devuelve un json de un array de los autos que estan estacionados y ya
         salieron. */
     $this->get('/outed[/]', \ParksRoutesActions::class . ':getAllOuted');
+
+    // los autos que entraro y salieron para esa fecha/rango.
+    $this->get('/outed/{date_from}/{date_to}[/]', \ParksRoutesActions::class . ':getOutedFromRange')->add(\MWAuthorizer::class . ':userVerification');
+    $this->get('/outed/{date}[/]', \ParksRoutesActions::class . ':getOutedFromDate')->add(\MWAuthorizer::class . ':userVerification');
+
     /*  para sacar un auto del estacionamiento. devuelve un json con un booleano en
         outed y el parks cerrado o null. */
     $this->get('/out_car/license/{car_license}[/]', \ParksRoutesActions::class . ':outCarFromLicense');
@@ -104,6 +109,14 @@ $app->group('/employee', function () {
     $this->delete('/{employee_id}[/]', \EmployeeRoutesActions::class . ':delete')->add(\MWAuthorizer::class . ':userVerification');
 
     $this->post('/verify[/]', \EmployeeRoutesActions::class . ':verify');
+
+    // get logs
+    $this->get('/logs/{date_from}/{date_to}[/]', \EmployeeRoutesActions::class . ':logsFromRange')->add(\MWAuthorizer::class . ':userVerification');
+    $this->get('/logs/{date}[/]', \EmployeeRoutesActions::class . ':logsFromDate')->add(\MWAuthorizer::class . ':userVerification');
+    // cantidad de operacions por empleado
+    $this->get('/{employee_id}/operations/{date_from}/{date_to}[/]', \EmployeeRoutesActions::class . ':cantOperationsFromRange')->add(\MWAuthorizer::class . ':userVerification');
+    $this->get('/{employee_id}/operations/{date}[/]', \EmployeeRoutesActions::class . ':cantOperationsFromDate')->add(\MWAuthorizer::class . ':userVerification');
+
 });
 
 /*** PRUEBA ********///////////
@@ -121,8 +134,22 @@ $app->get('/ejecutarCodigoConVerificacion', function (Request $request, Response
 /**********************************************/
 /*  Funciones de manejo de la clase Location  */
 /**********************************************/
-$app->group('/location', function () {
+$app->group('/location', function() {
     $this->get('[/]', \LocationRoutesActions::class . ':getAll');
+
+    $this->get('/most_used/{date}[/]', \LocationRoutesActions::class . ':getMostUsedFromDate');
+    $this->get('/most_used/{date_from}/{date_to}[/]', \LocationRoutesActions::class . ':getMostUsedFromRange');
+
+    $this->get('/least_used/{date}[/]', \LocationRoutesActions::class . ':getLeastUsedFromDate');
+    $this->get('/least_used/{date_from}/{date_to}[/]', \LocationRoutesActions::class . ':getLeastUsedFromRange');
+
+    $this->get('/unused/{date}[/]', \LocationRoutesActions::class . ':getUnusedFromDate');
+    $this->get('/unused/{date_from}/{date_to}[/]', \LocationRoutesActions::class . ':getUnusedFromRange');
+
+
+    $this->get('/most_used[/]', \LocationRoutesActions::class . ':getMostUsed');
+    $this->get('/least_used[/]', \LocationRoutesActions::class . ':getLeastUsed');
+    $this->get('/unused[/]', \LocationRoutesActions::class . ':getUnused');
 
     $this->get('/{location_id}[/]', \LocationRoutesActions::class . ':getFromId');
 
@@ -131,6 +158,7 @@ $app->group('/location', function () {
     $this->post('[/]', \LocationRoutesActions::class . ':save');
 
     $this->delete('/{location_id}[/]', \LocationRoutesActions::class . ':delete');
+
 })->add(\MWAuthorizer::class . ':userVerification');
 /******************************************/
 /*  Funciones de manejo de la clase Price */

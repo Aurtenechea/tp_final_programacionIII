@@ -53,7 +53,7 @@ class Location implements JsonSerializable{
         return $dba->returnLastInsertId();
     }
     public static function getAll(){
-        
+
         $dba = DBAccess::getDBAccessObj();
         $query = $dba->getQueryObj("SELECT * FROM LOCATION;");
         $query->execute();
@@ -132,22 +132,155 @@ class Location implements JsonSerializable{
     }
     public static function getMostUsed(){
       $dba = DBAccess::getDBAccessObj();
-      $query = $dba->getQueryObj("SELECT count(*) AS cant, L.*, P.location_id FROM PARKS AS P INNER JOIN LOCATION AS L ON L.id = P.location_id GROUP BY location_id ORDER BY cant DESC LIMIT 1;" );
+      // $query = $dba->getQueryObj("SELECT count(*) AS cant, L.*, P.location_id FROM PARKS AS P INNER JOIN LOCATION AS L ON L.id = P.location_id GROUP BY location_id ORDER BY cant DESC LIMIT 1;" );
+      $query = $dba->getQueryObj("SELECT TIMESTAMPDIFF(MINUTE, check_in, check_out) AS minut_dif, P.* FROM PARKS AS P ORDER BY minut_dif DESC LIMIT 1;" );
+      $query->execute();
+      $parks = $query->fetchAll(PDO::FETCH_CLASS, "Parks");
+      $parks = empty($parks) ? null : $parks[0];
+      return $parks;
+    }
+    public static function getMostUsedFromDate($date){
+      $dba = DBAccess::getDBAccessObj();
+      // $query = $dba->getQueryObj("SELECT count(*) AS cant, L.*, P.location_id FROM PARKS AS P INNER JOIN LOCATION AS L ON L.id = P.location_id GROUP BY location_id ORDER BY cant DESC LIMIT 1;" );
+      $query_text = "SELECT TIMESTAMPDIFF(MINUTE, check_in, check_out) AS minut_dif, P.* FROM PARKS AS P " .
+                    " WHERE CAST(check_in AS DATE) " .
+                    " BETWEEN CAST('" .
+                    $date . " 00:00:00' AS DATE) AND CAST('" .
+                    $date . " 23:59:59' AS DATE) " .
+                    " AND CAST(check_out AS DATE) " .
+                    " BETWEEN CAST('" .
+                    $date . " 00:00:00' AS DATE) AND CAST('" .
+                    $date . " 23:59:59' AS DATE) " .
+                    " ORDER BY minut_dif DESC LIMIT 1;";
+      $query = $dba->getQueryObj( $query_text );
+      $query->execute();
+      $parks = $query->fetchAll(PDO::FETCH_CLASS, "Parks");
+      $parks = empty($parks) ? null : $parks[0];
+      return $parks;
+    }
+    public static function getMostUsedFromRange($date_from, $date_to){
+      $dba = DBAccess::getDBAccessObj();
+      // $query = $dba->getQueryObj("SELECT count(*) AS cant, L.*, P.location_id FROM PARKS AS P INNER JOIN LOCATION AS L ON L.id = P.location_id GROUP BY location_id ORDER BY cant DESC LIMIT 1;" );
+      $query_text = "SELECT TIMESTAMPDIFF(MINUTE, check_in, check_out) AS minut_dif, P.* FROM PARKS AS P " .
+                    " WHERE CAST(check_in AS DATE) " .
+                    " BETWEEN CAST('" .
+                    $date_from . " 00:00:00' AS DATE) AND CAST('" .
+                    $date_to . " 23:59:59' AS DATE) " .
+                    " AND CAST(check_out AS DATE) " .
+                    " BETWEEN CAST('" .
+                    $date_from . " 00:00:00' AS DATE) AND CAST('" .
+                    $date_to . " 23:59:59' AS DATE) " .
+                    " ORDER BY minut_dif DESC LIMIT 1;";
+      $query = $dba->getQueryObj( $query_text );
+      $query->execute();
+      $parks = $query->fetchAll(PDO::FETCH_CLASS, "Parks");
+      $parks = empty($parks) ? null : $parks[0];
+      return $parks;
+    }
+    public static function getUnusedFromDate($date){
+      $dba = DBAccess::getDBAccessObj();
+      $query_text = "SELECT L.* FROM LOCATION AS L ".
+                    " WHERE L.id NOT IN (select location_id from PARKS ".
+                                          " WHERE CAST(check_in AS DATE) " .
+                                          " BETWEEN CAST('" .
+                                          $date . " 00:00:00' AS DATE) AND CAST('" .
+                                          $date . " 23:59:59' AS DATE) " .
+                                          " AND CAST(check_out AS DATE) " .
+                                          " BETWEEN CAST('" .
+                                          $date . " 00:00:00' AS DATE) AND CAST('" .
+                                          $date . " 23:59:59' AS DATE) " .
+                                      " );";
+
+      $query = $dba->getQueryObj( $query_text );
       $query->execute();
       $location = $query->fetchAll(PDO::FETCH_CLASS, "Location");
-      $location = empty($location) ? null : $location[0];
+      $location = empty($location) ? null : $location;
       return $location;
+    }
+
+    public static function getUnusedFromRange($date_from, $date_to){
+      $dba = DBAccess::getDBAccessObj();
+      $query_text = "SELECT L.* FROM LOCATION AS L ".
+                    " WHERE L.id NOT IN (select location_id from PARKS ".
+                                          " WHERE CAST(check_in AS DATE) " .
+                                          " BETWEEN CAST('" .
+                                          $date_from . " 00:00:00' AS DATE) AND CAST('" .
+                                          $date_to . " 23:59:59' AS DATE) " .
+                                          " AND CAST(check_out AS DATE) " .
+                                          " BETWEEN CAST('" .
+                                          $date_from . " 00:00:00' AS DATE) AND CAST('" .
+                                          $date_to . " 23:59:59' AS DATE) " .
+                                      " );";
+
+      $query = $dba->getQueryObj( $query_text );
+      $query->execute();
+      $location = $query->fetchAll(PDO::FETCH_CLASS, "Location");
+      $location = empty($location) ? null : $location;
+      return $location;
+    }
+
+    public static function getLeastUsedFromDate($date){
+      $dba = DBAccess::getDBAccessObj();
+      $query_text = "SELECT TIMESTAMPDIFF(MINUTE, check_in, check_out) AS minut_dif, P.* FROM PARKS AS P " .
+                    " WHERE CAST(check_in AS DATE) " .
+                    " BETWEEN CAST('" .
+                    $date . " 00:00:00' AS DATE) AND CAST('" .
+                    $date . " 23:59:59' AS DATE) " .
+                    " AND CAST(check_out AS DATE) " .
+                    " BETWEEN CAST('" .
+                    $date . " 00:00:00' AS DATE) AND CAST('" .
+                    $date . " 23:59:59' AS DATE) " .
+                    " AND P.check_out IS NOT NULL" .
+                    " ORDER BY minut_dif ASC LIMIT 1;";
+
+      $query = $dba->getQueryObj( $query_text );
+      $query->execute();
+      $parks = $query->fetchAll(PDO::FETCH_CLASS, "Parks");
+      $parks = empty($parks) ? null : $parks[0];
+      return $parks;
+    }
+
+    public static function getLeastUsedFromRange($date_from, $date_to){
+      $dba = DBAccess::getDBAccessObj();
+      // $query = $dba->getQueryObj("SELECT count(*) AS cant, L.*, P.location_id FROM PARKS AS P INNER JOIN LOCATION AS L ON L.id = P.location_id GROUP BY location_id ORDER BY cant DESC LIMIT 1;" );
+      $query_text = "SELECT TIMESTAMPDIFF(MINUTE, check_in, check_out) AS minut_dif, P.* FROM PARKS AS P " .
+                    " WHERE CAST(check_in AS DATE) " .
+                    " BETWEEN CAST('" .
+                    $date_from . " 00:00:00' AS DATE) AND CAST('" .
+                    $date_to . " 23:59:59' AS DATE) " .
+                    " AND CAST(check_out AS DATE) " .
+                    " BETWEEN CAST('" .
+                    $date_from . " 00:00:00' AS DATE) AND CAST('" .
+                    $date_to . " 23:59:59' AS DATE) " .
+                    " AND P.check_out IS NOT NULL" .
+                    " ORDER BY minut_dif ASC LIMIT 1;";
+      $query = $dba->getQueryObj( $query_text );
+      $query->execute();
+      $parks = $query->fetchAll(PDO::FETCH_CLASS, "Parks");
+      $parks = empty($parks) ? null : $parks[0];
+      return $parks;
     }
 
     // TODO, seleccionar una location en la que el id no este en la lista de
     // location_ids usadas en PARKS   OR   la que count sea menor.
     public static function getLeastUsed(){
       $dba = DBAccess::getDBAccessObj();
-      $query = $dba->getQueryObj("SELECT count(*) AS cant, L.*, P.location_id FROM PARKS AS P INNER JOIN LOCATION AS L ON L.id = P.location_id GROUP BY location_id ORDER BY cant ASC LIMIT 1;" );
+      // $query = $dba->getQueryObj("SELECT count(*) AS cant, L.*, P.location_id FROM PARKS AS P INNER JOIN LOCATION AS L ON L.id = P.location_id GROUP BY location_id ORDER BY cant ASC LIMIT 1;" );
+      $query = $dba->getQueryObj("SELECT TIMESTAMPDIFF(MINUTE, check_in, check_out) AS minut_dif , P.* FROM PARKS AS P WHERE P.check_out IS NOT NULL ORDER BY minut_dif ASC LIMIT 1;" );
+      $query->execute();
+      $parks = $query->fetchAll(PDO::FETCH_CLASS, "Parks");
+      $parks = empty($parks) ? null : $parks[0];
+      return $parks;
+    }
+
+    public static function getUnused(){
+      $dba = DBAccess::getDBAccessObj();
+      $query = $dba->getQueryObj("SELECT L.* FROM LOCATION AS L WHERE L.id NOT IN (select location_id from PARKS);" );
       $query->execute();
       $location = $query->fetchAll(PDO::FETCH_CLASS, "Location");
-      $location = empty($location) ? null : $location[0];
+      $location = empty($location) ? null : $location;
       return $location;
     }
+
     // </API methods **************************************
 }
