@@ -180,7 +180,6 @@ class Parks implements JsonSerializable{
             // vd($day_dif);
             // vd($priceObj);
             // vd($total);die();
-            vd( $total );die;
             return $total;
         }
     }

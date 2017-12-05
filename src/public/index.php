@@ -120,16 +120,14 @@ $app->group('/employee', function () {
 });
 
 /*** PRUEBA ********///////////
-$app->get('/ejecutarCodigoConVerificacion', function (Request $request, Response $response) {
-    // $bodyParams = $request->getParsedBody();
-    $response->getBody()->write("SE EJECUTA CODIGO CON VERIFICACION.");
-    /*  tomar un valor pasado por el MW. */
-    $employee = $request->getAttribute('employee');
-    /*  el MW me paso los datos del empleado que mando la solicitud con su jwt. */
-    // vd($employee);
-    // vd($bodyParams);
-    return $response;
-})->add(\MWAuthorizer::class . ':userVerification');
+// $app->get('/ejecutarCodigoConVerificacion', function (Request $request, Response $response) {
+//     // $bodyParams = $request->getParsedBody();
+//     $response->getBody()->write("SE EJECUTA CODIGO CON VERIFICACION.");
+//     /*  tomar un valor pasado por el MW. */
+//     $employee = $request->getAttribute('employee');
+//     /*  el MW me paso los datos del empleado que mando la solicitud con su jwt. */
+//     return $response;
+// })->add(\MWAuthorizer::class . ':userVerification');
 
 /**********************************************/
 /*  Funciones de manejo de la clase Location  */
@@ -145,7 +143,6 @@ $app->group('/location', function() {
 
     $this->get('/unused/{date}[/]', \LocationRoutesActions::class . ':getUnusedFromDate');
     $this->get('/unused/{date_from}/{date_to}[/]', \LocationRoutesActions::class . ':getUnusedFromRange');
-
 
     $this->get('/most_used[/]', \LocationRoutesActions::class . ':getMostUsed');
     $this->get('/least_used[/]', \LocationRoutesActions::class . ':getLeastUsed');
@@ -165,7 +162,6 @@ $app->group('/location', function() {
 /******************************************/
 $app->group('/price', function () {
     $this->post('[/]', \PriceRoutesActions::class . ':save');
-
 })->add(\MWAuthorizer::class . ':userVerification');
 
 $app->run();

@@ -43,7 +43,7 @@ class Price implements JsonSerializable{
                                     );
         $query->bindValue(':hour',$this->hour, PDO::PARAM_STR);
         $query->bindValue(':half_day',$this->half_day, PDO::PARAM_STR);
-		$query->bindValue(':day',$this->day, PDO::PARAM_STR);
+    		$query->bindValue(':day',$this->day, PDO::PARAM_STR);
         $query->execute();
         return $dba->returnLastInsertId();
     }

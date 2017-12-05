@@ -263,6 +263,6 @@ class ParksRoutesActions
         $price = Price::getPriceFromDate($parks->getCheck_in());
         $cost = $car->getDisabled() ? 0 : $parks->calculateCost($price);
 
-        return var_dump($cost);
+        return $cost;
     }
 }
